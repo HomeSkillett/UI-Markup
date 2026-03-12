@@ -418,11 +418,17 @@ body {
 }
 
 /* ====== KANBAN BOARD ====== */
+.kanban-section {
+  display: flex;
+  flex-direction: column;
+}
 .kanban-board {
   display: flex;
   gap: var(--space-lg);
-  align-items: flex-start;
+  align-items: stretch;
   width: 100%;
+  flex: 1;
+  min-height: 0;
 }
 
 .kanban-column {
@@ -437,7 +443,10 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--ForegroundPrimary);
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
   padding: var(--space-md) var(--space-lg);
   border: 1px solid var(--InformationGray);
   border-radius: var(--radius-base) var(--radius-base) 0 0;
@@ -446,19 +455,32 @@ body {
 .kanban-column-header .count {
   color: var(--InformationGray);
 }
+.kanban-column-header::before {
+  font-family: "Mobius-System-Icons";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
 
-/* Column header state colors */
+/* Column header state colors + icons */
 .kanban-column.col-todo .kanban-column-header       { border-color: var(--InformationGray); background: var(--BackgroundStepOne); }
+.kanban-column.col-todo .kanban-column-header::before       { content: "\E54C"; color: var(--InformationGray); }
 .kanban-column.col-paused .kanban-column-header     { border-color: var(--InformationOrange); background: var(--MessageDeliveryBackgroundWarning); }
+.kanban-column.col-paused .kanban-column-header::before     { content: "\E115"; color: var(--InformationOrange); }
 .kanban-column.col-inprocess .kanban-column-header   { border-color: var(--InformationBlue); background: var(--MessageDeliveryBackgroundInfo); }
+.kanban-column.col-inprocess .kanban-column-header::before   { content: "\E114"; color: var(--InformationBlue); }
 .kanban-column.col-delayed .kanban-column-header     { border-color: var(--InformationRed); background: var(--MessageDeliveryBackgroundCritical); }
+.kanban-column.col-delayed .kanban-column-header::before     { content: "\E412"; color: var(--InformationRed); }
 .kanban-column.col-completed .kanban-column-header   { border-color: var(--InformationGreen); background: var(--MessageDeliveryBackgroundOk); }
+.kanban-column.col-completed .kanban-column-header::before   { content: "\E41A"; color: var(--InformationGreen); font-size: 30px; }
 
 .kanban-column-body {
   flex: 1;
   background: var(--BackgroundStrong);
   padding: var(--space-md);
-  min-height: 100vh;
+  min-height: 200px;
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
@@ -689,7 +711,9 @@ body {
 
 </div>
 
-<h2 style="font: var(--font-light) var(--size-hdrMd) / var(--lh-hdrMd) var(--header-font); color: var(--ForegroundPrimary); margin: var(--space-huge) 0 var(--space-xxxl);">
+<div class="kanban-section">
+
+<h2 style="font: var(--font-light) var(--size-hdrMd) / var(--lh-hdrMd) var(--header-font); color: var(--ForegroundPrimary); margin: 0 0 var(--space-lg); padding-top: var(--space-huge);">
   CMS Kanban Board
 </h2>
 
@@ -731,8 +755,22 @@ body {
   </div>
 
 </div>
+</div>
 
 <script>
+/* Size kanban-section to fill from its top to viewport bottom minus 32px */
+(function() {
+  const section = document.querySelector('.kanban-section');
+  if (!section) return;
+  function resize() {
+    const top = section.offsetTop;
+    const vh = window.innerHeight;
+    section.style.height = (vh - top - 32) + 'px';
+  }
+  resize();
+  window.addEventListener('resize', resize);
+})();
+
 document.querySelectorAll('.card-chevrons').forEach(chevrons => {
   chevrons.addEventListener('click', (e) => {
     e.stopPropagation();
