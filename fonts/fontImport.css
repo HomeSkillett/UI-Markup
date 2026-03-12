@@ -1,0 +1,112 @@
+/* fonts.css
+   Self-hosted font declarations with fallbacks.
+
+   Expected folder layout (edit to match your project):
+   /public/fonts/
+     roboto/
+       Roboto-Thin.woff2 / .woff / .ttf
+       Roboto-Light.woff2 / .woff / .ttf
+       Roboto-Regular.woff2 / .woff / .ttf
+       Roboto-Bold.woff2 / .woff / .ttf        (optional)
+     roboto-condensed/
+       RobotoCondensed-Regular.woff2 / .woff / .ttf
+       RobotoCondensed-Bold.woff2 / .woff / .ttf
+     mobius/
+       Mobius-System-Icons.woff2 / .woff / .ttf
+
+   Notes:
+   - Order matters: woff2 -> woff -> ttf.
+   - If you don't ship a given format, remove that line to avoid 404s.
+   - text fonts: font-display: swap
+   - icon fonts: font-display: block (reduces "icon flash")
+*/
+
+/* =========================
+   Roboto
+   ========================= */
+
+@font-face {
+  font-family: "Roboto";
+  src:
+    url("/fonts/roboto/Roboto-Thin.woff2") format("woff2"),
+    url("/fonts/roboto/Roboto-Thin.woff") format("woff"),
+    url("/fonts/roboto/Roboto-Thin.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto";
+  src:
+    url("/fonts/roboto/Roboto-Light.woff2") format("woff2"),
+    url("/fonts/roboto/Roboto-Light.woff") format("woff"),
+    url("/fonts/roboto/Roboto-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto";
+  src:
+    url("/fonts/roboto/Roboto-Regular.woff2") format("woff2"),
+    url("/fonts/roboto/Roboto-Regular.woff") format("woff"),
+    url("/fonts/roboto/Roboto-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Optional: only include if you actually ship it */
+@font-face {
+  font-family: "Roboto";
+  src:
+    url("/fonts/roboto/Roboto-Bold.woff2") format("woff2"),
+    url("/fonts/roboto/Roboto-Bold.woff") format("woff"),
+    url("/fonts/roboto/Roboto-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* =========================
+   Roboto Condensed
+   ========================= */
+
+@font-face {
+  font-family: "Roboto Condensed";
+  src:
+    url("/fonts/roboto-condensed/RobotoCondensed-Regular.woff2") format("woff2"),
+    url("/fonts/roboto-condensed/RobotoCondensed-Regular.woff") format("woff"),
+    url("/fonts/roboto-condensed/RobotoCondensed-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto Condensed";
+  src:
+    url("/fonts/roboto-condensed/RobotoCondensed-Bold.woff2") format("woff2"),
+    url("/fonts/roboto-condensed/RobotoCondensed-Bold.woff") format("woff"),
+    url("/fonts/roboto-condensed/RobotoCondensed-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* =========================
+   Mobius icon font
+   ========================= */
+
+@font-face {
+  font-family: "Mobius-System-Icons";
+  src:
+    url("/fonts/mobius/Mobius-System-Icons.woff2") format("woff2"),
+    url("/fonts/mobius/Mobius-System-Icons.woff") format("woff"),
+    url("/fonts/mobius/Mobius-System-Icons.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
