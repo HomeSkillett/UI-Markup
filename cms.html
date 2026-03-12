@@ -447,6 +447,13 @@ body {
 .kanban-filter:hover .filter-value {
   color: var(--MouseOverPrimary);
 }
+.kanban-filter.active:hover {
+  color: var(--MouseOverPrimary);
+}
+.kanban-filter.active:hover .filter-label,
+.kanban-filter.active:hover .filter-value {
+  color: var(--MouseOverPrimary);
+}
 .kanban-filter::after {
   font-family: "Mobius-System-Icons";
   content: "\E00B";
@@ -456,6 +463,68 @@ body {
   line-height: 1;
   -webkit-font-smoothing: antialiased;
 }
+
+/* ====== FILTER DROPDOWNS ====== */
+.kanban-filter {
+  position: relative;
+}
+.kanban-filter.active {
+  color: var(--ForegroundAction);
+}
+.kanban-filter.active .filter-label,
+.kanban-filter.active .filter-value {
+  color: var(--ForegroundAction);
+}
+.kanban-filter::after {
+  transition: transform var(--transition-slow);
+}
+.kanban-filter.active::after {
+  transform: rotate(180deg);
+}
+
+.filter-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 180px;
+  background: var(--BackgroundInput);
+  border: 1px solid var(--MouseOverPrimary);
+  border-radius: var(--radius-base);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.13);
+  z-index: var(--z-dropdown);
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, opacity 0.5s ease;
+}
+.kanban-filter.active .filter-dropdown {
+  max-height: 400px;
+  opacity: 1;
+}
+
+.filter-dropdown-option {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  padding: var(--space-lg) var(--space-lg);
+  font: var(--font-normal) var(--size-default) / 1 var(--default-font);
+  color: var(--ForegroundStrong);
+  cursor: pointer;
+  transition: background var(--transition-slow), color var(--transition-slow);
+  white-space: nowrap;
+}
+.filter-dropdown-option:hover {
+  background: var(--MouseOverPrimary);
+  color: var(--SelectionForeground);
+}
+.filter-dropdown-option.selected {
+  background: var(--SelectionPrimary);
+  color: var(--SelectionForeground);
+}
+.filter-dropdown-option.selected:hover {
+  background: var(--MouseOverPrimary);
+  color: var(--SelectionForeground);
+}
 </style>
 </head>
 <body>
@@ -463,11 +532,64 @@ body {
 <div class="kanban-section">
 
 <div class="kanban-filters">
-  <div class="kanban-filter"><span class="filter-label">Operator:</span><span class="filter-value">Me</span></div>
-  <div class="kanban-filter"><span class="filter-label">Vehicle:</span><span class="filter-value">All</span></div>
-  <div class="kanban-filter"><span class="filter-label">Section:</span><span class="filter-value">All</span></div>
-  <div class="kanban-filter"><span class="filter-label">Task:</span><span class="filter-value">All</span></div>
-  <div class="kanban-filter"><span class="filter-label">Date:</span><span class="filter-value">Last 7 Days</span></div>
+  <div class="kanban-filter" data-filter="operator">
+    <span class="filter-label">Operator:</span><span class="filter-value">All</span>
+    <div class="filter-dropdown">
+      <div class="filter-dropdown-option selected" data-value="All">All</div>
+      <div class="filter-dropdown-option" data-value="Mel Torrie">Mel Torrie</div>
+      <div class="filter-dropdown-option" data-value="Todd Aznavorian">Todd Aznavorian</div>
+      <div class="filter-dropdown-option" data-value="Kevin Westwood">Kevin Westwood</div>
+      <div class="filter-dropdown-option" data-value="Carlo Bos">Carlo Bos</div>
+      <div class="filter-dropdown-option" data-value="Jake Yeagley">Jake Yeagley</div>
+    </div>
+  </div>
+  <div class="kanban-filter" data-filter="vehicle">
+    <span class="filter-label">Vehicle:</span><span class="filter-value">All</span>
+    <div class="filter-dropdown">
+      <div class="filter-dropdown-option selected" data-value="All">All</div>
+      <div class="filter-dropdown-option" data-value="Tractor 9R">Tractor 9R</div>
+      <div class="filter-dropdown-option" data-value="Tractor 8R">Tractor 8R</div>
+      <div class="filter-dropdown-option" data-value="Wheel Loader">Wheel Loader</div>
+      <div class="filter-dropdown-option" data-value="Articulated Dump Truck (ADT)">Articulated Dump Truck (ADT)</div>
+      <div class="filter-dropdown-option" data-value="Water Truck">Water Truck</div>
+      <div class="filter-dropdown-option" data-value="Compactor">Compactor</div>
+      <div class="filter-dropdown-option" data-value="Dozer">Dozer</div>
+      <div class="filter-dropdown-option" data-value="Excavator">Excavator</div>
+    </div>
+  </div>
+  <div class="kanban-filter" data-filter="section">
+    <span class="filter-label">Section:</span><span class="filter-value">All</span>
+    <div class="filter-dropdown">
+      <div class="filter-dropdown-option selected" data-value="All">All</div>
+      <div class="filter-dropdown-option" data-value="Northeast">Northeast</div>
+      <div class="filter-dropdown-option" data-value="North Quadrant">North Quadrant</div>
+      <div class="filter-dropdown-option" data-value="West Wing">West Wing</div>
+      <div class="filter-dropdown-option" data-value="Foundation Zone">Foundation Zone</div>
+      <div class="filter-dropdown-option" data-value="Boundary Line">Boundary Line</div>
+    </div>
+  </div>
+  <div class="kanban-filter" data-filter="task">
+    <span class="filter-label">Task:</span><span class="filter-value">All</span>
+    <div class="filter-dropdown">
+      <div class="filter-dropdown-option selected" data-value="All">All</div>
+      <div class="filter-dropdown-option" data-value="Clear and Grub">Clear and Grub</div>
+      <div class="filter-dropdown-option" data-value="Site Prep">Site Prep</div>
+      <div class="filter-dropdown-option" data-value="Concrete Pour">Concrete Pour</div>
+      <div class="filter-dropdown-option" data-value="Excavation">Excavation</div>
+      <div class="filter-dropdown-option" data-value="Grading">Grading</div>
+      <div class="filter-dropdown-option" data-value="Paving">Paving</div>
+    </div>
+  </div>
+  <div class="kanban-filter" data-filter="date">
+    <span class="filter-label">Date:</span><span class="filter-value">Last 7 Days</span>
+    <div class="filter-dropdown">
+      <div class="filter-dropdown-option" data-value="Today">Today</div>
+      <div class="filter-dropdown-option selected" data-value="Last 7 Days">Last 7 Days</div>
+      <div class="filter-dropdown-option" data-value="Last 2 Weeks">Last 2 Weeks</div>
+      <div class="filter-dropdown-option" data-value="Last Month">Last Month</div>
+      <div class="filter-dropdown-option" data-value="All Time">All Time</div>
+    </div>
+  </div>
 </div>
 
 <div class="kanban-board">
@@ -876,6 +998,42 @@ document.querySelectorAll('.card-details-link').forEach(link => {
     e.stopPropagation();
     console.log('Go to details');
   });
+});
+
+
+/* Filter dropdown toggle */
+document.querySelectorAll('.kanban-filter').forEach(filter => {
+  filter.addEventListener('click', (e) => {
+    // Don't toggle if clicking on a dropdown option (handled separately)
+    if (e.target.classList.contains('filter-dropdown-option')) return;
+    e.stopPropagation();
+    const wasActive = filter.classList.contains('active');
+    // Close all dropdowns first
+    document.querySelectorAll('.kanban-filter.active').forEach(f => f.classList.remove('active'));
+    // Toggle this one
+    if (!wasActive) filter.classList.add('active');
+  });
+});
+
+/* Dropdown option selection */
+document.querySelectorAll('.filter-dropdown-option').forEach(option => {
+  option.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const filter = option.closest('.kanban-filter');
+    const dropdown = option.closest('.filter-dropdown');
+    // Update selected state
+    dropdown.querySelectorAll('.filter-dropdown-option').forEach(o => o.classList.remove('selected'));
+    option.classList.add('selected');
+    // Update the displayed value
+    filter.querySelector('.filter-value').textContent = option.dataset.value;
+    // Close dropdown
+    filter.classList.remove('active');
+  });
+});
+
+/* Close dropdowns on outside click */
+document.addEventListener('click', () => {
+  document.querySelectorAll('.kanban-filter.active').forEach(f => f.classList.remove('active'));
 });
 </script>
 
