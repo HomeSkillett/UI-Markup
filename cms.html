@@ -415,15 +415,60 @@ body {
   gap: var(--space-lg);
   overflow-y: auto;
 }
+
+/* ====== FILTER BAR ====== */
+.kanban-filters {
+  display: flex;
+  gap: var(--space-huge);
+  align-items: center;
+  justify-content: flex-end;
+  padding: var(--space-md) 0;
+}
+.kanban-filter {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundPrimary);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--transition-slow);
+}
+.kanban-filter:hover {
+  color: var(--MouseOverPrimary);
+}
+.kanban-filter .filter-label {
+  color: var(--ForegroundPrimary);
+}
+.kanban-filter .filter-value {
+  color: var(--ForegroundPrimary);
+}
+.kanban-filter:hover .filter-label,
+.kanban-filter:hover .filter-value {
+  color: var(--MouseOverPrimary);
+}
+.kanban-filter::after {
+  font-family: "Mobius-System-Icons";
+  content: "\E00B";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
 </style>
 </head>
 <body>
 
 <div class="kanban-section">
 
-<h2 style="font: var(--font-light) var(--size-hdrMd) / var(--lh-hdrMd) var(--header-font); color: var(--ForegroundPrimary); margin: 0 0 var(--space-lg);">
-  CMS Kanban Board
-</h2>
+<div class="kanban-filters">
+  <div class="kanban-filter"><span class="filter-label">Operator:</span><span class="filter-value">Me</span></div>
+  <div class="kanban-filter"><span class="filter-label">Vehicle:</span><span class="filter-value">All</span></div>
+  <div class="kanban-filter"><span class="filter-label">Section:</span><span class="filter-value">All</span></div>
+  <div class="kanban-filter"><span class="filter-label">Task:</span><span class="filter-value">All</span></div>
+  <div class="kanban-filter"><span class="filter-label">Date:</span><span class="filter-value">Last 7 Days</span></div>
+</div>
 
 <div class="kanban-board">
 
