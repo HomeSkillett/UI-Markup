@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMS — Kanban Board</title>
+<link rel="stylesheet" href="design-tokens.css">
+<style>
+@font-face {
+  font-family: "Mobius-System-Icons";
+  src:
+    url("fonts/Mobius-System-Icons.woff2") format("woff2"),
+    url("fonts/Mobius-System-Icons.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+  font: var(--font-normal) var(--size-default) / var(--lh-default) var(--default-font);
+  color: var(--ForegroundPrimary);
+  background: var(--BackgroundPrimary);
+  -webkit-font-smoothing: antialiased;
+  padding: var(--space-huge);
+}
+
+/* ====== CARD COMPONENT ====== */
+.task-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  width: 100%;
+}
+
+.cms-card {
+  background: var(--BackgroundStrong);
+  border-radius: var(--radius-base);
+  padding: var(--space-lg) var(--space-lg) 0;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  position: relative;
+  border-left: 4px solid var(--InformationBlue);
+  transition: box-shadow var(--transition-slow), background var(--transition-slow);
+  cursor: pointer;
+}
+.cms-card:hover {
+  background: var(--BackgroundStepTwo);
+  box-shadow: var(--shadow-md);
+}
+
+.card-details-link {
+  font-family: "Mobius-System-Icons";
+  color: var(--ForegroundWatermark);
+  font-size: 24px;
+  font-style: normal;
+  font-weight: normal;
+  -webkit-font-smoothing: antialiased;
+  position: absolute;
+  top: 5px;
+  right: -5px;
+  text-decoration: none;
+  line-height: 1;
+  display: block;
+  width: var(--size-hdrSm);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--transition-slow), color var(--transition-slow);
+  z-index: var(--z-base);
+}
+.cms-card:hover .card-details-link,
+.cms-card.open .card-details-link {
+  opacity: 1;
+}
+.card-details-link:hover {
+  color: var(--MouseOverPrimary);
+  text-decoration: none;
+}
+
+.card-chevrons {
+  display: flex;
+  justify-content: space-between;
+  opacity: 0;
+  transition: opacity var(--transition-slow);
+  cursor: pointer;
+}
+.cms-card:hover .card-chevrons {
+  opacity: 1;
+}
+.card-chevrons span {
+  font-family: "Mobius-System-Icons";
+  font-size: 0;
+  color: var(--ForegroundWatermark);
+  font-style: normal;
+  font-weight: normal;
+  -webkit-font-smoothing: antialiased;
+  width: 50%;
+  text-align: center;
+  transition: color var(--transition-slow);
+}
+.card-chevrons:hover span {
+  color: var(--MouseOverPrimary);
+}
+.card-chevrons span::before {
+  font-size: var(--size-default);
+  content: "\E00B";
+}
+.cms-card.open .card-chevrons span::before {
+  content: "\E007";
+}
+
+/* State classes — on .cms-card */
+.cms-card.state-default   { border-left-color: var(--InformationBlue); }
+.cms-card.state-todo      { border-left-color: var(--InformationGray); }
+.cms-card.state-paused    { border-left-color: var(--InformationOrange); }
+.cms-card.state-delayed   { border-left-color: var(--InformationRed); }
+.cms-card.state-completed { border-left-color: var(--InformationGreen); }
+
+.cms-card.state-default .card-avatar   { border-color: var(--InformationBlue); background: var(--MessageDeliveryBackgroundInfo); }
+.cms-card.state-todo .card-avatar      { border: none; background: none; }
+.cms-card.state-paused .card-avatar    { border-color: var(--InformationOrange); background: var(--MessageDeliveryBackgroundWarning); }
+.cms-card.state-delayed .card-avatar   { border-color: var(--InformationRed); background: var(--MessageDeliveryBackgroundCritical); }
+.cms-card.state-completed .card-avatar { border-color: var(--InformationGreen); background: var(--MessageDeliveryBackgroundOk); }
+
+.card-hdr {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+}
+.card-hdr-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.card-location {
+  font: var(--font-normal) var(--size-default) / 1 var(--default-font);
+  color: var(--ForegroundPrimary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card-location a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--transition-slow), font-weight var(--transition-slow);
+}
+.card-location a:hover {
+  color: var(--MouseOverPrimary);
+  text-decoration: none;
+  font-weight: bolder;
+}
+
+.card-title {
+  font: var(--font-light) var(--size-hdrSm) / 1 var(--header-font);
+  color: var(--ForegroundPrimary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 100px;
+  overflow: visible;
+  flex-shrink: 0;
+  background: var(--MessageDeliveryBackgroundInfo);
+  border: 4px solid var(--InformationBlue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.card-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 100px;
+}
+
+.card-avatar-tooltip {
+  position: absolute;
+  top: 50%;
+  right: calc(100% - var(--space-md));
+  background: var(--BackgroundStrong);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-md);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-slow);
+  z-index: var(--z-dropdown);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-str);
+  font-family: var(--default-font);
+  font-size: var(--size-Sm);
+  line-height: 1.2;
+}
+.card-avatar:hover .card-avatar-tooltip {
+  opacity: 1;
+}
+.card-avatar-tooltip .tooltip-vehicle {
+  color: var(--ForegroundAction);
+  font-weight: var(--font-bold);
+}
+.card-avatar-tooltip .tooltip-complete {
+  color: var(--ForegroundPrimary);
+}
+.card-avatar-tooltip .tooltip-delta.ahead { color: var(--InformationGreen); }
+.card-avatar-tooltip .tooltip-delta.behind { color: var(--InformationRed); }
+.card-avatar-tooltip .tooltip-eta.ahead { color: var(--InformationGreen); }
+.card-avatar-tooltip .tooltip-eta.behind { color: var(--InformationRed); }
+
+.card-section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font: var(--font-normal) var(--size-default) / var(--lh-default) var(--default-font);
+  color: var(--ForegroundAction);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card-section a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--transition-slow), font-weight var(--transition-slow);
+}
+.card-section a::before {
+  font-family: 'Mobius-System-Icons';
+  content: "\E84C";
+  margin-right: var(--space-sm);
+}
+.card-section a:hover {
+  color: var(--MouseOverPrimary);
+  text-decoration: none;
+  font-weight: bolder;
+}
+
+.card-progress {
+  --progress-complete: 0%;
+  --progress-delta: 0%;
+  width: 100%;
+  height: 5px;
+  background: var(--InformationBlack);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.card-progress-delta {
+  position: absolute; top: 0; left: 0; height: 100%;
+  width: calc(var(--progress-complete) + var(--progress-delta));
+  background: var(--InformationGreen);
+  border-radius: 100px;
+}
+.card-progress.behind .card-progress-delta { background: var(--InformationRed); }
+.cms-card.state-paused .card-progress.behind .card-progress-delta { background: var(--InformationOrange); }
+.card-progress-complete {
+  position: absolute; top: 0; left: 0; height: 100%;
+  width: var(--progress-complete);
+  background: var(--InformationBlue);
+  border-radius: 100px;
+}
+
+.card-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, opacity 0.5s ease;
+}
+.cms-card.open .card-details {
+  max-height: 300px;
+  opacity: 1;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+.cms-card.open { background: var(--BackgroundStrong); }
+.cms-card.open:hover { background: var(--BackgroundStepTwo); }
+
+/* Paused + Delayed — always expanded, no collapse, no chevrons */
+.cms-card.state-paused .card-details,
+.cms-card.state-delayed .card-details {
+  max-height: 300px; opacity: 1; transition: none;
+}
+.cms-card.state-paused .card-chevrons,
+.cms-card.state-delayed .card-chevrons { display: none; }
+
+/* ToDo — Re-Assign visible collapsed, reorders to bottom when open */
+.cms-card.state-todo.open .card-actions { order: 1; }
+.cms-card.state-todo.open .card-chevrons { order: 2; }
+
+.card-date {
+  display: flex; align-items: center; gap: var(--space-sm);
+  font: var(--font-normal) var(--size-default) / var(--lh-default) var(--default-font);
+  color: var(--ForegroundPrimary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.card-date::before {
+  font-family: "Mobius-System-Icons"; content: "\E752";
+  font-style: normal; font-weight: normal; -webkit-font-smoothing: antialiased;
+}
+
+.card-time {
+  display: flex; gap: var(--space-md);
+  font: var(--font-normal) var(--size-Sm) / var(--lh-Sm) var(--default-font);
+  color: var(--ForegroundPrimary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.card-time .remaining.ahead { color: var(--InformationGreen); }
+.card-time .remaining.behind { color: var(--InformationRed); }
+
+.card-vehicle {
+  font: var(--font-normal) var(--size-default) / var(--lh-default) var(--default-font);
+  color: var(--ForegroundPrimary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.card-actions { display: flex; gap: var(--space-md); }
+.card-actions a {
+  font: var(--font-bold) var(--size-Sm) / var(--lh-Sm) var(--default-font);
+  color: var(--ForegroundAction); text-decoration: none; cursor: pointer;
+  transition: color var(--transition-slow);
+}
+.card-actions a:hover { color: var(--MouseOverPrimary); text-decoration: none; }
+
+.card-error {
+  font: var(--font-normal) var(--size-default) / var(--lh-default) var(--default-font);
+  color: var(--InformationRed);
+}
+.cms-card.state-paused .card-error { color: var(--InformationOrange); }
+
+.card-more { display: flex; justify-content: flex-end; }
+.card-more a {
+  font: var(--font-normal) var(--size-Sm) / var(--lh-Sm) var(--default-font);
+  color: var(--ForegroundAction); text-decoration: none;
+  transition: color var(--transition-slow);
+}
+.card-more a:hover { color: var(--MouseOverPrimary); text-decoration: none; }
+
+/* ====== KANBAN BOARD ====== */
+.kanban-section {
+  display: flex;
+  flex-direction: column;
+}
+.kanban-board {
+  display: flex;
+  gap: var(--space-lg);
+  align-items: stretch;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.kanban-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.kanban-column-header {
+  font: var(--font-light) var(--size-hdrMd) / var(--lh-hdrMd) var(--header-font);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ForegroundPrimary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border: 1px solid var(--InformationGray);
+  border-radius: var(--radius-base) var(--radius-base) 0 0;
+  background: var(--BackgroundStrong);
+}
+.kanban-column-header .count { color: var(--InformationGray); }
+.kanban-column-header::before {
+  font-family: "Mobius-System-Icons";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Column header state colors + icons */
+.kanban-column.col-todo .kanban-column-header       { border-color: var(--InformationGray); background: var(--BackgroundStepOne); }
+.kanban-column.col-todo .kanban-column-header::before       { content: "\E54C"; color: var(--InformationGray); }
+.kanban-column.col-paused .kanban-column-header     { border-color: var(--InformationOrange); background: var(--MessageDeliveryBackgroundWarning); }
+.kanban-column.col-paused .kanban-column-header::before     { content: "\E115"; color: var(--InformationOrange); }
+.kanban-column.col-inprocess .kanban-column-header   { border-color: var(--InformationBlue); background: var(--MessageDeliveryBackgroundInfo); }
+.kanban-column.col-inprocess .kanban-column-header::before   { content: "\E114"; color: var(--InformationBlue); }
+.kanban-column.col-delayed .kanban-column-header     { border-color: var(--InformationRed); background: var(--MessageDeliveryBackgroundCritical); }
+.kanban-column.col-delayed .kanban-column-header::before     { content: "\E412"; color: var(--InformationRed); }
+.kanban-column.col-completed .kanban-column-header   { border-color: var(--InformationGreen); background: var(--MessageDeliveryBackgroundOk); }
+.kanban-column.col-completed .kanban-column-header::before   { content: "\E41A"; color: var(--InformationGreen); font-size: 30px; }
+
+.kanban-column-body {
+  flex: 1;
+  background: var(--BackgroundStrong);
+  padding: var(--space-lg);
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  overflow-y: auto;
+}
+</style>
+</head>
+<body>
+
+<div class="kanban-section">
+
+<h2 style="font: var(--font-light) var(--size-hdrMd) / var(--lh-hdrMd) var(--header-font); color: var(--ForegroundPrimary); margin: 0 0 var(--space-lg);">
+  CMS Kanban Board
+</h2>
+
+<div class="kanban-board">
+
+  <!-- TO DO -->
+  <div class="kanban-column col-todo">
+    <div class="kanban-column-header">TO DO <span class="count">(10)</span></div>
+    <div class="kanban-column-body">
+
+      <div class="task-card"><div class="cms-card state-todo">
+        <a href="#" class="card-details-link">&#xEB0A;</a>
+        <div class="card-hdr">
+          <div class="card-hdr-text">
+            <div class="card-location"><a href="#">East Lot</a></div>
+            <div class="card-title">Site Prep</div>
+          </div>
+          <div class="card-avatar"><img src="Dozer.svg" alt="Dozer"></div>
+        </div>
+        <div class="card-section"><a href="#">North Quadrant</a></div>
+        <div class="card-progress" style="--progress-complete: 0%; --progress-delta: 0%;">
+          <div class="card-progress-delta"></div><div class="card-progress-complete"></div>
+        </div>
+        <div class="card-actions"><a href="#">Re-Assign</a></div>
+        <div class="card-details">
+          <div class="card-date">Dec 1st, 8:00 - Dec 15th, 17:00</div>
+          <div class="card-time"><span>Not Started</span><span class="remaining ahead">ETA 40hr</span></div>
+          <div class="card-vehicle">FN- Dozer D-10</div>
+        </div>
+        <div class="card-chevrons"><span></span><span></span></div>
+      </div></div>
+
+      <div class="task-card"><div class="cms-card state-todo">
+        <a href="#" class="card-details-link">&#xEB0A;</a>
+        <div class="card-hdr">
+          <div class="card-hdr-text">
+            <div class="card-location"><a href="#">West Ridge</a></div>
+            <div class="card-title">Foundation Layout</div>
+          </div>
+          <div class="card-avatar"><img src="Dozer.svg" alt="Dozer"></div>
+        </div>
+        <div class="card-section"><a href="#">Block C</a></div>
+        <div class="card-progress" style="--progress-complete: 0%; --progress-delta: 0%;">
+          <div class="card-progress-delta"></div><div class="card-progress-complete"></div>
+        </div>
+        <div class="card-actions"><a href="#">Re-Assign</a></div>
+        <div class="card-details">
+          <div class="card-date">Dec 5th, 7:00 - Dec 20th, 17:00</div>
+          <div class="card-time"><span>Not Started</span><span class="remaining ahead">ETA 60hr</span></div>
+          <div class="card-vehicle">FN- Excavator E-20</div>
+        </div>
+        <div class="card-chevrons"><span></span><span></span></div>
+      </div></div>
+
+      <div class="task-card"><div class="cms-card state-todo">
+        <a href="#" class="card-details-link">&#xEB0A;</a>
+        <div class="card-hdr">
+          <div class="card-hdr-text">
+            <div class="card-location"><a href="#">South Access Road</a></div>
+            <div class="card-title">Gravel Delivery</div>
+          </div>
+          <div class="card-avatar"><img src="Dozer.svg" alt="Dozer"></div>
+        </div>
+        <div class="card-section"><a href="#">Main Entry</a></div>
+        <div class="card-progress" style="--progress-complete: 0%; --progress-delta: 0%;">
+          <div class="card-progress-delta"></div><div class="card-progress-complete"></div>
+        </div>
+        <div class="card-actions"><a href="#">Re-Assign</a></div>
+        <div class="card-details">
+          <div class="card-date">Dec 10th, 6:00 - Dec 12th, 17:00</div>
+          <div class="card-time"><span>Not Started</span><span class="remaining ahead">ETA 16hr</span></div>
+          <div class="card-vehicle">FN- Hauler H-5</div>
+        </div>
+        <div class="card-chevrons"><span></span><span></span></div>
+      </div></div>
+
+    </div>
+  </div>
+
+  <!-- PAUSED -->
+  <div class="kanban-column col-paused">
+    <div class="kanban-column-header">PAUSED <span class="count">(2)</span></div>
+    <div class="kanban-column-body">
+
+      <div class="task-card"><div class="cms-card state-paused">
+        <a href="#" class="card-details-link">&#xEB0A;</a>
+        <div class="card-hdr">
+          <div class="card-hdr-text">
+            <div class="card-location"><a href="#">Retention Pond</a></div>
+            <div class="card-title">Clear and Grub</div>
+          </div>
+          <div class="card-avatar"><img src="Dozer.svg" alt="Dozer">
+            <div class="card-avatar-tooltip">
+              <span class="tooltip-vehicle">FN- Dozer D-10</span>
+              <span class="tooltip-complete">30% Complete</span>
+              <span class="tooltip-delta behind">15% Behind</span>
+              <span class="tooltip-eta behind">ETA 17:45</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-section"><a href="#">Northeast Section</a></div>
+        <div class="card-progress behind" style="--progress-complete: 30%; --progress-delta: 15%;">
+          <div class="card-progress-delta"></div><div class="card-progress-complete"></div>
+        </div>
+        <div class="card-details">
+          <div class="card-date">Nov 5th, 8:00 - Nov 20th, 17:00</div>
+          <div class="card-time"><span>24hr In-Progress</span><span class="remaining behind">12hr Behind</span></div>
+          <div class="card-vehicle">FN- Dozer D-10</div>
+          <div class="card-actions"><a href="#">Re-Assign</a></div>
+          <div class="card-error">Weather &#x2014; high winds, operations suspended</div>
+          <div class="card-more"><a href="#">More...</a></div>
+        </div>
+        <div class="card-chevrons"><span></span><span></span></div>
+      </div></div>
+
+      <div class="task-card"><div class="cms-card state-paused">
+        <a href="#" class="card-details-link">&#xEB0A;</a>
+        <div class="card-hdr">
+          <div class="card-hdr-text">
+            <div class="card-location"><a href="#">North Basin</a></div>
+            <div class="card-title">Drainage Install</div>
+          </div>
+          <div class="card-avatar"><img src="Dozer.svg" alt="Dozer">
+            <div class="card-avatar-tooltip">
+              <span class="tooltip-vehicle">FN- Excavator E-20</span>
+              <span class="tooltip-complete">45% Complete</span>
+              <span class="tooltip-delta behind">8% Behind</span>
+              <span class="tooltip-eta behind">ETA 16:30</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-section"><a href="#">Sector 4</a></div>
+        <div class="card-progress behind" style="--progress-complete: 45%; --progress-delta: 8%;">
+          <div class="card-progress-delta"></div><div class="card-progress-complete"></div>
+        </div>
+        <div class="card-details">
+          <div class="card-date">Nov 1st, 7:00 - Nov 18th, 17:00</div>
+          <div class="card-time"><span>32hr In-Progress</span><span class="remaining behind">8hr Behind</span></div>
+          <div class="card-vehicle">FN- Excavator E-20</div>
+          <div class="card-actions"><a href="#">Re-Assign</a></div>
+          <div class="card-error">Weather &#x2014; heavy rain, site flooded</div>
+          <div class="card-more"><a href="#">More...</a></div>
+        </div>
+        <div class="card-chevrons"><span></span><span></span></div>
+      </div></div>
+
+    </div>
+  </div>
+
+  <!-- IN PROCESS -->
+  <div class="kanban-column col-inprocess">
+    <div class="kanban-column-header">IN PROCESS <span class="count">(8)</span></div>
+    <div class="kanban-column-body">
+
+      <div class="task-card"><div class="cms-card state-default">
+        <a href="#" class="card-details-link">&#xEB0A;</a>
+        <div class="card-hdr">
+          <div class="card-hdr-text">
+            <div class="card-location"><a href="#">Retention Pond</a></div>
+            <div class="card-title">Clear and Grub</div>
+          </div>
+          <div class="card-avatar"><img src="Dozer.svg" alt="Dozer">
+            <div class="card-avatar-tooltip">
+              <span class="tooltip-vehicle">FN- Dozer D-10</span>
+              <span class="tooltip-complete">50% Complete</span>
+              <span class="tooltip-delta ahead">10% Ahead</span>
+              <span class="tooltip-eta ahead">ETA 14:30</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-section"><a href="#">Northeast Section</a></div>
+        <div class="card-progress" style="--progress-complete: 50%; --progress-delta: 10%;">
+          <div class="card-progress-delta"></div><div class="card-progress-complete"></div>
+        </div>
+        <div class="card-details">
+          <div class="card-date">Nov 11th, 8:00 - Nov 11th, 8:00</div>
+          <div class="card-time"><span>36.5hr In-Progress</span><span class="remaining ahead">4.5hr to Done</span></div>
+          <div class="card-vehicle">FN- Dozer D-10</div>
+          <div class="card-actions"><a href="#">Re-Assign</a></div>
+        </div>
+        <div class="card-chevrons"><span></span><span></span></div>
+      </div></div>
+
+      <div class="task-card"><div class="cms-card state-default">
+        <a href="#" class="card-details-link">&#xEB0A;</a>
+        <div class="card-hdr">
+          <div class="card-hdr-text">
+            <div class="card-location"><a href="#">Central Plaza</a></div>
+            <div class="card-title">Concrete Pour</div>
+          </div>
+          <div class="card-avatar"><img src="Dozer.svg" alt="Dozer">
+            <div class="card-avatar-tooltip">
+              <span class="tooltip-vehicle">FN- Mixer M-3</span>
+              <span class="tooltip-complete">72% Complete</span>
+              <span class="tooltip-delta ahead">5% Ahead</span>
+              <span class="tooltip-eta ahead">ETA 15:00</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-section"><a href="#">Foundation Zone</a></div>
+        <div class="card-progress" style="--progress-complete: 72%; --progress-delta: 5%;">
+          <div class="card-progress-delta"></div><div class="card-progress-complete"></div>
+        </div>
+        <div class="card-details">
+          <div class="card-date">Nov 8th, 6:00 - Nov 14th, 17:00</div>
+          <div class="card-time"><span>48hr In-Progress</span><span class="remaining ahead">2hr to Done</span></div>
+          <div class="card-vehicle">FN- Mixer M-3</div>
+          <div class="card-actions"><a href="#">Re-Assign</a></div>
+        </div>
+        <div class="card-chevrons"><span></span><span></span></div>
+      </div></div>
+
+      <div class="task-card"><div class="cms-card state-default">
+        <a href="#" class="card-details-link">&#xEB0A;</a>
+        <div class="card-hdr">
+          <div class="card-hdr-text">
+            <div class="card-location"><a href="#">East Perimeter</a></div>
+            <div class="card-title">Fence Installation</div>
+          </div>
+          <div class="card-avatar"><img src="Dozer.svg" alt="Dozer">
+            <div class="card-avatar-tooltip">
+              <span class="tooltip-vehicle">FN- Crane C-7</span>
+              <span class="tooltip-complete">20% Complete</span>
+              <span class="tooltip-delta behind">5% Behind</span>
+              <span class="tooltip-eta behind">ETA 18:00</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-section"><a href="#">Boundary Line</a></div>
+        <div class="card-progress behind" style="--progress-complete: 20%; --progress-delta: 5%;">
+          <div class="card-progress-delta"></div><div class="card-progress-complete"></div>
+        </div>
+        <div class="card-details">
+          <div class="card-date">Nov 10th, 7:00 - Nov 25th, 17:00</div>
+          <div class="card-time"><span>12hr In-Progress</span><span class="remaining behind">3hr Behind</span></div>
+          <div class="card-vehicle">FN- Crane C-7</div>
+          <div class="card-actions"><a href="#">Re-Assign</a></div>
+        </div>
+        <div class="card-chevrons"><span></span><span></span></div>
+      </div></div>
+
+    </div>
+  </div>
+
+  <!-- DELAYED -->
+  <div class="kanban-column col-delayed">
+    <div class="kanban-column-header">DELAYED <span class="count">(2)</span></div>
+    <div class="kanban-column-body">
+
+      <div class="task-card"><div class="cms-card state-delayed">
+        <a href="#" class="card-details-link">&#xEB0A;</a>
+        <div class="card-hdr">
+          <div class="card-hdr-text">
+            <div class="card-location"><a href="#">South Basin</a></div>
+            <div class="card-title">Excavation Phase II</div>
+          </div>
+          <div class="card-avatar"><img src="Dozer.svg" alt="Dozer">
+            <div class="card-avatar-tooltip">
+              <span class="tooltip-vehicle">FN- Dozer D-10</span>
+              <span class="tooltip-complete">65% Complete</span>
+              <span class="tooltip-delta behind">10% Behind</span>
+              <span class="tooltip-eta behind">ETA 19:15</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-section"><a href="#">West Wing</a></div>
+        <div class="card-progress behind" style="--progress-complete: 65%; --progress-delta: 10%;">
+          <div class="card-progress-delta"></div><div class="card-progress-complete"></div>
+        </div>
+        <div class="card-details">
+          <div class="card-date">Oct 5th, 7:00 - Oct 20th, 17:00</div>
+          <div class="card-time"><span>42hr In-Progress</span><span class="remaining behind">10hr Behind</span></div>
+          <div class="card-vehicle">FN- Dozer D-10</div>
+          <div class="card-actions"><a href="#">Re-Assign</a></div>
+          <div class="card-error">Obstacle &#x2014; unknown obstacle detected</div>
+          <div class="card-more"><a href="#">More...</a></div>
+        </div>
+        <div class="card-chevrons"><span></span><span></span></div>
+      </div></div>
+
+      <div class="task-card"><div class="cms-card state-delayed">
+        <a href="#" class="card-details-link">&#xEB0A;</a>
+        <div class="card-hdr">
+          <div class="card-hdr-text">
+            <div class="card-location"><a href="#">East Corridor</a></div>
+            <div class="card-title">Utility Trenching</div>
+          </div>
+          <div class="card-avatar"><img src="Dozer.svg" alt="Dozer">
+            <div class="card-avatar-tooltip">
+              <span class="tooltip-vehicle">FN- Excavator E-20</span>
+              <span class="tooltip-complete">40% Complete</span>
+              <span class="tooltip-delta behind">20% Behind</span>
+              <span class="tooltip-eta behind">ETA 20:00</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-section"><a href="#">Underground Run</a></div>
+        <div class="card-progress behind" style="--progress-complete: 40%; --progress-delta: 20%;">
+          <div class="card-progress-delta"></div><div class="card-progress-complete"></div>
+        </div>
+        <div class="card-details">
+          <div class="card-date">Oct 10th, 6:00 - Oct 28th, 17:00</div>
+          <div class="card-time"><span>28hr In-Progress</span><span class="remaining behind">18hr Behind</span></div>
+          <div class="card-vehicle">FN- Excavator E-20</div>
+          <div class="card-actions"><a href="#">Re-Assign</a></div>
+          <div class="card-error">Obstacle &#x2014; unmarked utility line found</div>
+          <div class="card-more"><a href="#">More...</a></div>
+        </div>
+        <div class="card-chevrons"><span></span><span></span></div>
+      </div></div>
+
+    </div>
+  </div>
+
+  <!-- COMPLETED -->
+  <div class="kanban-column col-completed">
+    <div class="kanban-column-header">COMPLETED <span class="count">(25)</span></div>
+    <div class="kanban-column-body">
+
+      <div class="task-card"><div class="cms-card state-completed">
+        <a href="#" class="card-details-link">&#xEB0A;</a>
+        <div class="card-hdr">
+          <div class="card-hdr-text">
+            <div class="card-location"><a href="#">North Ridge</a></div>
+            <div class="card-title">Final Grading</div>
+          </div>
+          <div class="card-avatar"><img src="Dozer.svg" alt="Dozer">
+            <div class="card-avatar-tooltip">
+              <span class="tooltip-vehicle">FN- Dozer D-10</span>
+              <span class="tooltip-complete">100% Complete</span>
+              <span class="tooltip-delta ahead">On Time</span>
+              <span class="tooltip-eta ahead">ETA 16:00</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-section"><a href="#">Southeast Lot</a></div>
+        <div class="card-progress" style="--progress-complete: 100%; --progress-delta: 0%;">
+          <div class="card-progress-delta"></div><div class="card-progress-complete"></div>
+        </div>
+        <div class="card-details">
+          <div class="card-date">Sep 1st, 7:00 - Oct 1st, 17:00</div>
+          <div class="card-time"><span>80hr Complete</span><span class="remaining ahead">On Time</span></div>
+          <div class="card-vehicle">FN- Dozer D-10</div>
+        </div>
+        <div class="card-chevrons"><span></span><span></span></div>
+      </div></div>
+
+      <div class="task-card"><div class="cms-card state-completed">
+        <a href="#" class="card-details-link">&#xEB0A;</a>
+        <div class="card-hdr">
+          <div class="card-hdr-text">
+            <div class="card-location"><a href="#">Loading Dock</a></div>
+            <div class="card-title">Paving Complete</div>
+          </div>
+          <div class="card-avatar"><img src="Dozer.svg" alt="Dozer">
+            <div class="card-avatar-tooltip">
+              <span class="tooltip-vehicle">FN- Paver P-2</span>
+              <span class="tooltip-complete">100% Complete</span>
+              <span class="tooltip-delta ahead">2hr Early</span>
+              <span class="tooltip-eta ahead">Done 14:00</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-section"><a href="#">Bay Area</a></div>
+        <div class="card-progress" style="--progress-complete: 100%; --progress-delta: 0%;">
+          <div class="card-progress-delta"></div><div class="card-progress-complete"></div>
+        </div>
+        <div class="card-details">
+          <div class="card-date">Oct 15th, 6:00 - Nov 1st, 17:00</div>
+          <div class="card-time"><span>120hr Complete</span><span class="remaining ahead">2hr Early</span></div>
+          <div class="card-vehicle">FN- Paver P-2</div>
+        </div>
+        <div class="card-chevrons"><span></span><span></span></div>
+      </div></div>
+
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+/* Size kanban-section to fill from its top to viewport bottom minus 32px */
+(function() {
+  const section = document.querySelector('.kanban-section');
+  if (!section) return;
+  function resize() {
+    const top = section.offsetTop;
+    const vh = window.innerHeight;
+    section.style.height = (vh - top - 32) + 'px';
+  }
+  resize();
+  window.addEventListener('resize', resize);
+})();
+
+document.querySelectorAll('.card-chevrons').forEach(chevrons => {
+  chevrons.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const card = chevrons.closest('.cms-card');
+    if (card.classList.contains('state-delayed') || card.classList.contains('state-paused')) return;
+    card.classList.toggle('open');
+  });
+});
+document.querySelectorAll('.card-details-link').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Go to details');
+  });
+});
+</script>
+
+</body>
+</html>
