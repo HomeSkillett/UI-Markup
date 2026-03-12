@@ -416,6 +416,54 @@ body {
   color: var(--MouseOverPrimary);
   text-decoration: none;
 }
+
+/* ====== KANBAN BOARD ====== */
+.kanban-board {
+  display: flex;
+  gap: var(--space-lg);
+  align-items: flex-start;
+  width: 100%;
+}
+
+.kanban-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.kanban-column-header {
+  font: var(--font-light) var(--size-hdrMd) / var(--lh-hdrMd) var(--header-font);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ForegroundPrimary);
+  text-align: center;
+  padding: var(--space-md) var(--space-lg);
+  border: 1px solid var(--InformationGray);
+  border-radius: var(--radius-base) var(--radius-base) 0 0;
+  background: var(--BackgroundStrong);
+}
+.kanban-column-header .count {
+  color: var(--InformationGray);
+}
+
+/* Column header state colors */
+.kanban-column.col-todo .kanban-column-header       { border-color: var(--InformationGray); background: var(--BackgroundStepOne); }
+.kanban-column.col-paused .kanban-column-header     { border-color: var(--InformationOrange); background: var(--MessageDeliveryBackgroundWarning); }
+.kanban-column.col-inprocess .kanban-column-header   { border-color: var(--InformationBlue); background: var(--MessageDeliveryBackgroundInfo); }
+.kanban-column.col-delayed .kanban-column-header     { border-color: var(--InformationRed); background: var(--MessageDeliveryBackgroundCritical); }
+.kanban-column.col-completed .kanban-column-header   { border-color: var(--InformationGreen); background: var(--MessageDeliveryBackgroundOk); }
+
+.kanban-column-body {
+  flex: 1;
+  background: var(--BackgroundStrong);
+  padding: var(--space-md);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  overflow-y: auto;
+}
 </style>
 </head>
 <body>
@@ -636,6 +684,49 @@ body {
         </div>
         <div class="card-chevrons"><span></span><span></span></div>
       </div>
+    </div>
+  </div>
+
+</div>
+
+<h2 style="font: var(--font-light) var(--size-hdrMd) / var(--lh-hdrMd) var(--header-font); color: var(--ForegroundPrimary); margin: var(--space-huge) 0 var(--space-xxxl);">
+  CMS Kanban Board
+</h2>
+
+<div class="kanban-board">
+
+  <!-- TO DO -->
+  <div class="kanban-column col-todo">
+    <div class="kanban-column-header">TO DO <span class="count">(10)</span></div>
+    <div class="kanban-column-body">
+    </div>
+  </div>
+
+  <!-- PAUSED -->
+  <div class="kanban-column col-paused">
+    <div class="kanban-column-header">PAUSED <span class="count">(2)</span></div>
+    <div class="kanban-column-body">
+    </div>
+  </div>
+
+  <!-- IN PROCESS -->
+  <div class="kanban-column col-inprocess">
+    <div class="kanban-column-header">IN PROCESS <span class="count">(8)</span></div>
+    <div class="kanban-column-body">
+    </div>
+  </div>
+
+  <!-- DELAYED -->
+  <div class="kanban-column col-delayed">
+    <div class="kanban-column-header">DELAYED <span class="count">(0)</span></div>
+    <div class="kanban-column-body">
+    </div>
+  </div>
+
+  <!-- COMPLETED -->
+  <div class="kanban-column col-completed">
+    <div class="kanban-column-header">COMPLETED <span class="count">(25)</span></div>
+    <div class="kanban-column-body">
     </div>
   </div>
 
