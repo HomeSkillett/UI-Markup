@@ -326,11 +326,17 @@ body {
 .cms-table {
   width: 100%;
   border-radius: var(--radius-base);
-  overflow: hidden;
   margin-bottom: var(--space-xxl);
   text-box-trim: both;
   text-box-edge: cap alphabetic;
   --col-status: 190px;
+}
+/* Round first parent row top corners, last child row bottom corners */
+.cms-table .table-parent-row:first-child {
+  border-radius: var(--radius-base) var(--radius-base) 0 0;
+}
+.cms-table .table-child-rows:last-child .table-child-row:last-child {
+  border-radius: 0 0 var(--radius-base) var(--radius-base);
 }
 
 /* --- Parent row (section header) --- */
@@ -367,10 +373,11 @@ body {
   line-height: 0;
   color: var(--ForegroundWatermark);
   transition: transform var(--transition-slow);
+  transform: rotate(-90deg);
   -webkit-font-smoothing: antialiased;
 }
 .table-parent-row.open .table-cell-chevron::before {
-  transform: rotate(180deg);
+  transform: rotate(0deg);
 }
 
 /* Info cell inner layout (chevron + text) */
@@ -415,6 +422,7 @@ body {
   align-items: center;
   justify-content: flex-end;
   padding: 10px 15px;
+  overflow: visible;
 }
 
 /* Info cell (status label + name + timestamp) */
@@ -507,13 +515,17 @@ body {
 }
 .cell-progress-stats .stat-eta {
   font: var(--font-normal) var(--size-Sm) / 1 var(--default-font);
-  color: #80a639;
+  color: var(--InformationBlue);
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.cell-progress-stats .stat-eta.behind {
-  color: var(--InformationRed);
-}
+/* Stat ETA — status variants (inherits from row status) */
+.table-child-row.status-inprocess .stat-eta { color: var(--InformationBlue); }
+.table-child-row.status-paused .stat-eta    { color: var(--InformationOrange); }
+.table-child-row.status-completed .stat-eta { color: var(--InformationGreen); }
+.table-child-row.status-canceled .stat-eta  { color: var(--InformationRed); }
+.table-child-row.status-delayed .stat-eta   { color: var(--InformationRed); }
+.table-child-row.status-todo .stat-eta      { color: var(--InformationGray, #707070); }
 
 /* Progress bar (same pattern as kanban cards) */
 .table-parent-row .table-progress-bar {
@@ -545,6 +557,10 @@ body {
 }
 
 /* Status button */
+/* --- Status button component --- */
+.status-btn-wrap {
+  position: relative;
+}
 .status-btn {
   display: flex;
   align-items: center;
@@ -557,20 +573,23 @@ body {
   cursor: pointer;
   white-space: nowrap;
   min-width: 156px;
+  width: 166px;
 }
 .status-btn .status-dot {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--InformationBlue);
   flex-shrink: 0;
 }
 .status-btn .status-label {
   flex: 1;
   font: var(--font-normal) var(--size-default) / 1 var(--default-font);
-  color: var(--InformationBlue);
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.status-btn .status-chevron {
+  flex-shrink: 0;
+  padding-left: 11px;
 }
 .status-btn .status-chevron::after {
   font-family: "Mobius-System-Icons";
@@ -579,6 +598,64 @@ body {
   line-height: 0;
   color: var(--ForegroundPrimary);
   -webkit-font-smoothing: antialiased;
+}
+/* Open state — blue top border, no bottom radius */
+.status-btn-wrap.open {
+  z-index: 200;
+}
+.status-btn-wrap.open .status-btn {
+  border-color: var(--MouseOverPrimary, #0cd0ff);
+  border-radius: 6px 6px 0 0;
+}
+
+/* Status color variants */
+.status-btn[data-status="inprocess"] .status-dot { background: var(--InformationBlue); }
+.status-btn[data-status="inprocess"] .status-label { color: var(--InformationBlue); }
+.status-btn[data-status="paused"] .status-dot { background: var(--InformationOrange); }
+.status-btn[data-status="paused"] .status-label { color: var(--InformationOrange); }
+.status-btn[data-status="completed"] .status-dot { background: var(--InformationGreen); }
+.status-btn[data-status="completed"] .status-label { color: var(--InformationGreen); }
+.status-btn[data-status="canceled"] .status-dot { background: var(--InformationRed); }
+.status-btn[data-status="canceled"] .status-label { color: var(--InformationRed); }
+.status-btn[data-status="delayed"] .status-dot { background: var(--InformationRed); }
+.status-btn[data-status="delayed"] .status-label { color: var(--InformationRed); }
+.status-btn[data-status="todo"] .status-dot { background: var(--InformationGray, #707070); }
+.status-btn[data-status="todo"] .status-label { color: var(--InformationGray, #707070); }
+
+/* Dropdown menu */
+.status-dropdown {
+  display: none;
+  position: absolute;
+  top: 38px;
+  left: 0;
+  width: 166px;
+  background: var(--BackgroundInput, white);
+  border: 1px solid var(--MouseOverPrimary, #0cd0ff);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.13);
+  z-index: 100;
+  overflow: clip;
+}
+.status-btn-wrap.open .status-dropdown {
+  display: block;
+}
+.status-dropdown-option {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 12px;
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundStrong, #002b45);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.status-dropdown-option:hover {
+  background: var(--BackgroundStepTwo, #f0f0f0);
+}
+.status-dropdown-option.selected {
+  background: var(--SelectionPrimary, #009fda);
+  color: var(--SelectionForeground, white);
 }
 
 /* --- Child rows (task rows) --- */
@@ -591,6 +668,7 @@ body {
 .table-parent-row.open + .table-child-rows {
   max-height: 3000px;
   opacity: 1;
+  overflow: visible;
 }
 
 .table-child-row {
@@ -598,21 +676,28 @@ body {
   align-items: center;
   background: var(--BackgroundStepOne);
   border-left: 4px solid var(--InformationBlue);
-  min-height: 55px;
+  height: 59px;
+  border-radius: 4px;
   transition: background var(--transition-slow);
+}
+/* Zebra striping: odd = StepOne, even = Primary */
+.table-child-row:nth-child(even) {
+  background: var(--BackgroundPrimary);
 }
 .table-child-row:hover {
   background: var(--BackgroundStepTwo);
 }
-.table-child-row.status-green {
-  border-left-color: var(--InformationGreen);
+/* Last child row — bottom border */
+.table-child-row:last-child {
+  border-bottom: 2px solid var(--BackgroundInputOutline, #c7c7c7);
 }
-.table-child-row.status-orange {
-  border-left-color: var(--InformationOrange);
-}
-.table-child-row.status-gray {
-  border-left-color: var(--InformationGray, #707070);
-}
+/* Child row status variants — border-left */
+.table-child-row.status-inprocess { border-left-color: var(--InformationBlue); }
+.table-child-row.status-paused    { border-left-color: var(--InformationOrange); }
+.table-child-row.status-completed { border-left-color: var(--InformationGreen); }
+.table-child-row.status-canceled  { border-left-color: var(--InformationRed); }
+.table-child-row.status-delayed   { border-left-color: var(--InformationRed); }
+.table-child-row.status-todo      { border-left-color: var(--InformationGray, #707070); }
 
 /* Child task name cell */
 .table-child-row .child-cell-task {
@@ -631,7 +716,7 @@ body {
   justify-content: center;
   width: 25px;
   height: 25px;
-  border: 1px solid var(--InformationGreen);
+  border: 1px solid var(--InformationBlue);
   border-radius: 3px;
   flex-shrink: 0;
 }
@@ -639,29 +724,24 @@ body {
   font-family: "Mobius-Icons", "Mobius-System-Icons";
   font-size: 14px;
   line-height: 0;
-  color: var(--InformationGreen);
+  color: var(--InformationBlue);
   opacity: 0.65;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
 }
-.table-child-row.status-blue .child-vehicle-icon {
-  border-color: var(--InformationBlue);
-}
-.table-child-row.status-blue .child-vehicle-icon .icon-glyph {
-  color: var(--InformationBlue);
-}
-.table-child-row.status-orange .child-vehicle-icon {
-  border-color: var(--InformationOrange);
-}
-.table-child-row.status-orange .child-vehicle-icon .icon-glyph {
-  color: var(--InformationOrange);
-}
-.table-child-row.status-gray .child-vehicle-icon {
-  border-color: var(--InformationGray, #707070);
-}
-.table-child-row.status-gray .child-vehicle-icon .icon-glyph {
-  color: var(--InformationGray, #707070);
-}
+/* Vehicle icon — status variants */
+.table-child-row.status-inprocess .child-vehicle-icon { border-color: var(--InformationBlue); }
+.table-child-row.status-inprocess .child-vehicle-icon .icon-glyph { color: var(--InformationBlue); }
+.table-child-row.status-paused .child-vehicle-icon { border-color: var(--InformationOrange); }
+.table-child-row.status-paused .child-vehicle-icon .icon-glyph { color: var(--InformationOrange); }
+.table-child-row.status-completed .child-vehicle-icon { border-color: var(--InformationGreen); }
+.table-child-row.status-completed .child-vehicle-icon .icon-glyph { color: var(--InformationGreen); }
+.table-child-row.status-canceled .child-vehicle-icon { border-color: var(--InformationRed); }
+.table-child-row.status-canceled .child-vehicle-icon .icon-glyph { color: var(--InformationRed); }
+.table-child-row.status-delayed .child-vehicle-icon { border-color: var(--InformationRed); }
+.table-child-row.status-delayed .child-vehicle-icon .icon-glyph { color: var(--InformationRed); }
+.table-child-row.status-todo .child-vehicle-icon { border-color: var(--InformationGray, #707070); }
+.table-child-row.status-todo .child-vehicle-icon .icon-glyph { color: var(--InformationGray, #707070); }
 .child-task-name {
   font: var(--font-normal) var(--size-default) / 1 var(--default-font);
   color: var(--ForegroundPrimary);
@@ -704,6 +784,7 @@ body {
   align-items: center;
   justify-content: flex-end;
   padding: 10px 15px;
+  overflow: visible;
 }
 
 </style>
@@ -724,18 +805,18 @@ body {
       <span class="nav-section-title">Retention Pond</span>
     </div>
     <div class="nav-section-items">
-      <div class="nav-item active">Clear and Grub &#x2013; WP-RET-001</div>
-      <div class="nav-item">Water Truck (Dust Control) &#x2013; WP-RET-002</div>
-      <div class="nav-item">Ripping &#x2013; WP-RET-003</div>
-      <div class="nav-item">Cut &amp; Fill (Bulk) &#x2013; WP-RET-004</div>
-      <div class="nav-item">Haulage (Spoil Export) &#x2013; WP-RET-005</div>
-      <div class="nav-item">Cut &amp; Fill (Rough Shape) &#x2013; WP-RET-007</div>
-      <div class="nav-item">Trenching (Outlet Corridor) &#x2013; WP-RET-008</div>
-      <div class="nav-item">Topping (Finish Shape) &#x2013; WP-RET-009</div>
-      <div class="nav-item">Water Truck (Moisture Conditioning) &#x2013; WP-RET-010</div>
-      <div class="nav-item">Compactor (Berm Lift 1) &#x2013; WP-RET-011</div>
-      <div class="nav-item">Water Truck (Dust Control) &#x2013; WP-RET-012</div>
-      <div class="nav-item">Compactor (Berm Lift 2) &#x2013; WP-RET-013</div>
+      <div class="nav-item active">Clear and Grub</div>
+      <div class="nav-item">Water Truck (Dust Control)</div>
+      <div class="nav-item">Ripping</div>
+      <div class="nav-item">Cut &amp; Fill (Bulk)</div>
+      <div class="nav-item">Haulage (Spoil Export)</div>
+      <div class="nav-item">Cut &amp; Fill (Rough Shape)</div>
+      <div class="nav-item">Trenching (Outlet Corridor)</div>
+      <div class="nav-item">Topping (Finish Shape)</div>
+      <div class="nav-item">Water Truck (Moisture Conditioning)</div>
+      <div class="nav-item">Compactor (Berm Lift 1)</div>
+      <div class="nav-item">Water Truck (Dust Control)</div>
+      <div class="nav-item">Compactor (Berm Lift 2)</div>
     </div>
   </div>
 
@@ -745,13 +826,13 @@ body {
       <span class="nav-section-title">Haul Road</span>
     </div>
     <div class="nav-section-items">
-      <div class="nav-item">Cut &amp; Fill (Bulk) &#x2013; WP-HR-002</div>
-      <div class="nav-item">Haulage (Import Fill) &#x2013; WP-HR-003</div>
-      <div class="nav-item">Water Truck (Dust Control) &#x2013; WP-HR-004</div>
-      <div class="nav-item">Water Truck (Moisture Conditioning) &#x2013; WP-HR-005</div>
-      <div class="nav-item">Compactor (Lift 1) &#x2013; WP-HR-006</div>
-      <div class="nav-item">Topping (Finish Shape) &#x2013; WP-HR-007</div>
-      <div class="nav-item">Water Truck (Dust Control) &#x2013; WP-HR-008</div>
+      <div class="nav-item">Cut &amp; Fill (Bulk)</div>
+      <div class="nav-item">Haulage (Import Fill)</div>
+      <div class="nav-item">Water Truck (Dust Control)</div>
+      <div class="nav-item">Water Truck (Moisture Conditioning)</div>
+      <div class="nav-item">Compactor (Lift 1)</div>
+      <div class="nav-item">Topping (Finish Shape)</div>
+      <div class="nav-item">Water Truck (Dust Control)</div>
     </div>
   </div>
 
@@ -875,6 +956,422 @@ body {
 <!-- CMS Table -->
 <div class="cms-table">
 
+  <!-- === RETENTION POND === -->
+  <div class="table-parent-row open" data-section="retention-pond">
+    <div class="table-cell table-cell-info">
+      <div class="cell-info-inner">
+        <span class="table-cell-chevron"></span>
+        <div class="cell-info-text">
+          <span class="cell-status-label">In Progress</span>
+          <div class="cell-name">Retention Pond</div>
+          <span class="cell-timestamp">2 min ago</span>
+        </div>
+      </div>
+    </div>
+    <div class="table-cell table-cell-location">
+      <a href="#">A1.1 &#x2013; Northeast Section</a>
+    </div>
+    <div class="table-cell table-cell-progress">
+      <div class="cell-date-row">
+        <span class="cell-date-icon"></span>
+        <span class="cell-date-text">Nov 11th, 8:00 &#x2013; Nov 11th, 8:00</span>
+      </div>
+      <div class="cell-progress-stats">
+        <span class="stat-primary">36.5hr In-Progress</span>
+        <span class="stat-eta">4.5hr to Done</span>
+      </div>
+      <div class="table-progress-bar">
+        <div class="bar-delta" style="width: 70%"></div>
+        <div class="bar-complete" style="width: 55%"></div>
+      </div>
+    </div>
+    <div class="table-cell table-cell-status">
+      <div class="status-btn-wrap">
+        <div class="status-btn" data-status="completed">
+          <span class="status-dot"></span>
+          <span class="status-label">COMPLETED</span>
+          <span class="status-chevron"></span>
+        </div>
+        <div class="status-dropdown">
+          <div class="status-dropdown-option" data-value="inprocess">In Process</div>
+          <div class="status-dropdown-option" data-value="paused">Paused</div>
+          <div class="status-dropdown-option selected" data-value="completed">Completed</div>
+          <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-child-rows">
+    <!-- Row 1: Clear and Grub — inprocess (green border in Figma) -->
+    <div class="table-child-row status-inprocess">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Clear and Grub &#x2013; WP-RET-001</span>
+      </div>
+      <div class="child-cell-vehicle"><span>FN- Dozer D-10</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">82% &#x2013; 14.2hr</span>
+          <span class="stat-eta">3h 10m to Done</span>
+        </div>
+        <div class="table-progress-bar">
+          <div class="bar-delta" style="width: 90%"></div>
+          <div class="bar-complete" style="width: 82%"></div>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="inprocess">
+            <span class="status-dot"></span>
+            <span class="status-label">IN PROCESS</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option selected" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Water Truck (Dust Control) — inprocess -->
+    <div class="table-child-row status-inprocess">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Water Truck (Dust Control) &#x2013; WP-RET-002</span>
+      </div>
+      <div class="child-cell-vehicle"><span>WT-01</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">55% · 2.1hr in</span>
+          <span class="stat-eta">ETA 1h 05m</span>
+        </div>
+        <div class="table-progress-bar">
+          <div class="bar-delta" style="width: 65%"></div>
+          <div class="bar-complete" style="width: 55%"></div>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="inprocess">
+            <span class="status-dot"></span>
+            <span class="status-label">IN PROCESS</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option selected" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: Ripping — delayed (red) -->
+    <div class="table-child-row status-delayed">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Ripping &#x2013; WP-RET-003</span>
+      </div>
+      <div class="child-cell-vehicle"><span>DOZ-01</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">0% Queued</span>
+          <span class="stat-eta">Blocker: Waiting on Clear &amp; Grub</span>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="delayed">
+            <span class="status-dot"></span>
+            <span class="status-label">DELAYED</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 4: Cut & Fill (Bulk) — todo -->
+    <div class="table-child-row status-todo">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Cut &amp; Fill (Bulk) &#x2013; WP-RET-004</span>
+      </div>
+      <div class="child-cell-vehicle"><span>SCR-01</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">0% Queued</span>
+          <span class="stat-eta">Blocker: Waiting on Ripping</span>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="todo">
+            <span class="status-dot"></span>
+            <span class="status-label">TO DO</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 5: Haulage (Spoil Export) — todo -->
+    <div class="table-child-row status-todo">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Haulage (Spoil Export) &#x2013; WP-RET-005</span>
+      </div>
+      <div class="child-cell-vehicle"><span>ADT-03</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">0% Queued</span>
+          <span class="stat-eta">Blocker: Waiting on first spoil pile</span>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="todo">
+            <span class="status-dot"></span>
+            <span class="status-label">TO DO</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 6: Cut & Fill (Rough Shape) — todo -->
+    <div class="table-child-row status-todo">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Cut &amp; Fill (Rough Shape) &#x2013; WP-RET-007</span>
+      </div>
+      <div class="child-cell-vehicle"><span>DOZ-02</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">0% Queued</span>
+          <span class="stat-eta">Blocker: Waiting on Bulk Cut to rough grade</span>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="todo">
+            <span class="status-dot"></span>
+            <span class="status-label">TO DO</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 7: Trenching (Outlet Corridor) — todo -->
+    <div class="table-child-row status-todo">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Trenching (Outlet Corridor) &#x2013; WP-RET-008</span>
+      </div>
+      <div class="child-cell-vehicle"><span>TRN-01</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">0% Queued</span>
+          <span class="stat-eta">ETA 5.0hr · Blocker: Waiting on Rough Shape</span>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="todo">
+            <span class="status-dot"></span>
+            <span class="status-label">TO DO</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 8: Topping (Finish Shape) — todo -->
+    <div class="table-child-row status-todo">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Topping (Finish Shape) &#x2013; WP-RET-009</span>
+      </div>
+      <div class="child-cell-vehicle"><span>DOZ-02</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">0% Queued</span>
+          <span class="stat-eta">ETA 4.5hr · Blocker: Waiting on Trenching</span>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="todo">
+            <span class="status-dot"></span>
+            <span class="status-label">TO DO</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 9: Water Truck (Moisture Conditioning) — todo -->
+    <div class="table-child-row status-todo">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Water Truck (Moisture Conditioning) &#x2013; WP-RET-010</span>
+      </div>
+      <div class="child-cell-vehicle"><span>WT-01</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">0% Queued</span>
+          <span class="stat-eta">ETA 2h 15m · Blocker: Ready after lift placed</span>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="todo">
+            <span class="status-dot"></span>
+            <span class="status-label">TO DO</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 10: Compactor (Berm Lift 1) — todo -->
+    <div class="table-child-row status-todo">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Compactor (Berm Lift 1) &#x2013; WP-RET-011</span>
+      </div>
+      <div class="child-cell-vehicle"><span>COM-01</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">0% Queued</span>
+          <span class="stat-eta">ETA 6h 45m · Blocker: Waiting on Moisture Conditioning</span>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="todo">
+            <span class="status-dot"></span>
+            <span class="status-label">TO DO</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 11: Water Truck (Dust Control) — todo -->
+    <div class="table-child-row status-todo">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Water Truck (Dust Control) &#x2013; WP-RET-012</span>
+      </div>
+      <div class="child-cell-vehicle"><span>WT-01</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">0% Queued</span>
+          <span class="stat-eta">ETA 50m · Blocker: Runs during haul window</span>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="todo">
+            <span class="status-dot"></span>
+            <span class="status-label">TO DO</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 12: Compactor (Berm Lift 2) — todo -->
+    <div class="table-child-row status-todo">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Compactor (Berm Lift 2) &#x2013; WP-RET-013</span>
+      </div>
+      <div class="child-cell-vehicle"><span>COM-01</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">0% Queued</span>
+          <span class="stat-eta">ETA 7h 10m · Blocker: After lift 2 placed</span>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="todo">
+            <span class="status-dot"></span>
+            <span class="status-label">TO DO</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- === HAUL ROAD === -->
   <div class="table-parent-row open" data-section="haul-road">
     <div class="table-cell table-cell-info">
@@ -905,43 +1402,25 @@ body {
       </div>
     </div>
     <div class="table-cell table-cell-status">
-      <div class="status-btn">
-        <span class="status-dot"></span>
-        <span class="status-label">IN PROCESS</span>
-        <span class="status-chevron"></span>
+      <div class="status-btn-wrap">
+        <div class="status-btn" data-status="inprocess">
+          <span class="status-dot"></span>
+          <span class="status-label">IN PROCESS</span>
+          <span class="status-chevron"></span>
+        </div>
+        <div class="status-dropdown">
+          <div class="status-dropdown-option selected" data-value="inprocess">In Process</div>
+          <div class="status-dropdown-option" data-value="paused">Paused</div>
+          <div class="status-dropdown-option" data-value="completed">Completed</div>
+          <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="table-child-rows">
-    <!-- Row 1: Clear and Grub (green, from Retention Pond context) -->
-    <div class="table-child-row status-green">
-      <div class="child-cell-task">
-        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
-        <span class="child-task-name">Clear and Grub &#x2013; WP-RET-001</span>
-      </div>
-      <div class="child-cell-vehicle"><span>FN- Dozer D-10</span></div>
-      <div class="child-cell-progress">
-        <div class="cell-progress-stats">
-          <span class="stat-primary">82% &#x2013; 14.2hr</span>
-          <span class="stat-eta">Done &#x2013; 28m ahead</span>
-        </div>
-        <div class="table-progress-bar">
-          <div class="bar-delta" style="width: 90%"></div>
-          <div class="bar-complete" style="width: 82%"></div>
-        </div>
-      </div>
-      <div class="child-cell-status">
-        <div class="status-btn">
-          <span class="status-dot"></span>
-          <span class="status-label">IN PROCESS</span>
-          <span class="status-chevron"></span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Row 2: Cut & Fill (Bulk) — WP-HR-002 (blue) -->
-    <div class="table-child-row status-blue">
+    <!-- Row 1: Cut & Fill (Bulk) — WP-HR-002 (blue) -->
+    <div class="table-child-row status-inprocess">
       <div class="child-cell-task">
         <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
         <span class="child-task-name">Cut &amp; Fill (Bulk) &#x2013; WP-HR-002</span>
@@ -958,16 +1437,24 @@ body {
         </div>
       </div>
       <div class="child-cell-status">
-        <div class="status-btn">
-          <span class="status-dot"></span>
-          <span class="status-label">IN PROCESS</span>
-          <span class="status-chevron"></span>
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="inprocess">
+            <span class="status-dot"></span>
+            <span class="status-label">IN PROCESS</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option selected" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Row 3: Haulage (Import Fill) — WP-HR-003 (blue) -->
-    <div class="table-child-row status-blue">
+    <div class="table-child-row status-inprocess">
       <div class="child-cell-task">
         <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
         <span class="child-task-name">Haulage (Import Fill) &#x2013; WP-HR-003</span>
@@ -984,16 +1471,24 @@ body {
         </div>
       </div>
       <div class="child-cell-status">
-        <div class="status-btn">
-          <span class="status-dot"></span>
-          <span class="status-label">IN PROCESS</span>
-          <span class="status-chevron"></span>
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="inprocess">
+            <span class="status-dot"></span>
+            <span class="status-label">IN PROCESS</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option selected" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Row 4: Water Truck (Dust Control) — WP-HR-004 (orange/weather) -->
-    <div class="table-child-row status-orange">
+    <div class="table-child-row status-paused">
       <div class="child-cell-task">
         <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
         <span class="child-task-name">Water Truck (Dust Control) &#x2013; WP-HR-004</span>
@@ -1002,7 +1497,7 @@ body {
       <div class="child-cell-progress">
         <div class="cell-progress-stats">
           <span class="stat-primary">5% &#x2013; 3.4h</span>
-          <span class="stat-eta behind">3h 24min to Done &#x2013; Weather</span>
+          <span class="stat-eta">3h 24min to Done &#x2013; Weather</span>
         </div>
         <div class="table-progress-bar">
           <div class="bar-delta" style="width: 12%"></div>
@@ -1010,16 +1505,24 @@ body {
         </div>
       </div>
       <div class="child-cell-status">
-        <div class="status-btn">
-          <span class="status-dot"></span>
-          <span class="status-label">IN PROCESS</span>
-          <span class="status-chevron"></span>
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="paused">
+            <span class="status-dot"></span>
+            <span class="status-label">PAUSED</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option selected" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Row 5: Water Truck (Moisture Conditioning) — WP-HR-005 (gray/queued) -->
-    <div class="table-child-row status-gray">
+    <div class="table-child-row status-todo">
       <div class="child-cell-task">
         <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
         <span class="child-task-name">Water Truck (Moisture Conditioning) &#x2013; WP-HR-005</span>
@@ -1032,16 +1535,24 @@ body {
         </div>
       </div>
       <div class="child-cell-status">
-        <div class="status-btn">
-          <span class="status-dot"></span>
-          <span class="status-label">IN PROCESS</span>
-          <span class="status-chevron"></span>
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="todo">
+            <span class="status-dot"></span>
+            <span class="status-label">TO DO</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Row 6: Compactor (Lift 1) — WP-HR-006 (gray/queued) -->
-    <div class="table-child-row status-gray">
+    <div class="table-child-row status-todo">
       <div class="child-cell-task">
         <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
         <span class="child-task-name">Compactor (Lift 1) &#x2013; WP-HR-006</span>
@@ -1054,16 +1565,24 @@ body {
         </div>
       </div>
       <div class="child-cell-status">
-        <div class="status-btn">
-          <span class="status-dot"></span>
-          <span class="status-label">IN PROCESS</span>
-          <span class="status-chevron"></span>
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="todo">
+            <span class="status-dot"></span>
+            <span class="status-label">TO DO</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Row 7: Topping (Finish Shape) — WP-HR-007 (gray/queued) -->
-    <div class="table-child-row status-gray">
+    <div class="table-child-row status-todo">
       <div class="child-cell-task">
         <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
         <span class="child-task-name">Topping (Finish Shape) &#x2013; WP-HR-007</span>
@@ -1076,16 +1595,24 @@ body {
         </div>
       </div>
       <div class="child-cell-status">
-        <div class="status-btn">
-          <span class="status-dot"></span>
-          <span class="status-label">IN PROCESS</span>
-          <span class="status-chevron"></span>
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="todo">
+            <span class="status-dot"></span>
+            <span class="status-label">TO DO</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Row 8: Water Truck (Dust Control) — WP-HR-008 (gray/queued) -->
-    <div class="table-child-row status-gray">
+    <div class="table-child-row status-todo">
       <div class="child-cell-task">
         <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
         <span class="child-task-name">Water Truck (Dust Control) &#x2013; WP-HR-008</span>
@@ -1098,10 +1625,18 @@ body {
         </div>
       </div>
       <div class="child-cell-status">
-        <div class="status-btn">
-          <span class="status-dot"></span>
-          <span class="status-label">IN PROCESS</span>
-          <span class="status-chevron"></span>
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="todo">
+            <span class="status-dot"></span>
+            <span class="status-label">TO DO</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1157,14 +1692,63 @@ document.querySelectorAll('.filter-dropdown-option').forEach(option => {
   });
 });
 
+/* Status button — toggle dropdown */
+document.querySelectorAll('.status-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const wrap = btn.closest('.status-btn-wrap');
+    const wasOpen = wrap.classList.contains('open');
+    // Close all other open dropdowns
+    document.querySelectorAll('.status-btn-wrap.open').forEach(w => w.classList.remove('open'));
+    if (!wasOpen) wrap.classList.add('open');
+  });
+});
+
+/* Status dropdown — option selection */
+const statusMap = {
+  inprocess: 'IN PROCESS',
+  paused: 'PAUSED',
+  completed: 'COMPLETED',
+  canceled: 'CANCELED',
+  delayed: 'DELAYED',
+  todo: 'TO DO'
+};
+const statusClasses = ['status-inprocess','status-paused','status-completed','status-canceled','status-delayed','status-todo'];
+document.querySelectorAll('.status-dropdown-option').forEach(option => {
+  option.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const wrap = option.closest('.status-btn-wrap');
+    const btn = wrap.querySelector('.status-btn');
+    const dropdown = wrap.querySelector('.status-dropdown');
+    const value = option.dataset.value;
+    // Update selected state
+    dropdown.querySelectorAll('.status-dropdown-option').forEach(o => o.classList.remove('selected'));
+    option.classList.add('selected');
+    // Update button
+    btn.dataset.status = value;
+    btn.querySelector('.status-label').textContent = statusMap[value] || value.toUpperCase();
+    // Update row class (border-left, vehicle icon, stat-eta)
+    const row = wrap.closest('.table-child-row');
+    if (row) {
+      row.classList.remove(...statusClasses);
+      row.classList.add('status-' + value);
+    }
+    // Close dropdown
+    wrap.classList.remove('open');
+  });
+});
+
 /* Close dropdowns on outside click */
 document.addEventListener('click', () => {
   document.querySelectorAll('.kanban-filter.active').forEach(f => f.classList.remove('active'));
+  document.querySelectorAll('.status-btn-wrap.open').forEach(w => w.classList.remove('open'));
 });
 
 /* Table parent row toggle */
 document.querySelectorAll('.table-parent-row').forEach(row => {
-  row.addEventListener('click', () => {
+  row.addEventListener('click', (e) => {
+    // Don't toggle if clicking the status button
+    if (e.target.closest('.status-btn-wrap')) return;
     row.classList.toggle('open');
   });
 });
