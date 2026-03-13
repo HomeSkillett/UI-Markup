@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMS — Table View</title>
+<link rel="stylesheet" href="design-tokens.css">
+<style>
+@font-face {
+  font-family: "Mobius-System-Icons";
+  src:
+    url("fonts/Mobius-System-Icons.woff2") format("woff2"),
+    url("fonts/Mobius-System-Icons.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+  font: var(--font-normal) var(--size-default) / var(--lh-default) var(--default-font);
+  color: var(--ForegroundPrimary);
+  background: var(--BackgroundPrimary);
+  -webkit-font-smoothing: antialiased;
+}
+
+
+/* ====== TOOLBAR (view buttons + filters) ====== */
+.kanban-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) 0;
+}
+
+/* View toggle buttons */
+.view-buttons {
+  display: flex;
+  gap: var(--space-huge);
+  align-items: flex-start;
+  cursor: pointer;
+}
+.view-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 32px;
+  padding-bottom: var(--space-sm);
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundPrimary);
+  text-decoration: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color var(--transition-slow), border-color var(--transition-slow);
+}
+.view-btn:hover {
+  color: var(--MouseOverPrimary);
+}
+.view-btn.active {
+  color: var(--ForegroundAction);
+  border-bottom-color: var(--ForegroundAction);
+}
+.view-btn.active:hover {
+  color: var(--MouseOverPrimary);
+  border-bottom-color: var(--MouseOverPrimary);
+}
+.view-btn svg {
+  width: 21px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* ====== FILTER BAR ====== */
+.kanban-filters {
+  display: flex;
+  gap: var(--space-huge);
+  align-items: center;
+}
+.kanban-filter {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundPrimary);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--transition-slow);
+}
+.kanban-filter:hover {
+  color: var(--MouseOverPrimary);
+}
+.kanban-filter .filter-label {
+  color: var(--ForegroundPrimary);
+}
+.kanban-filter .filter-value {
+  color: var(--ForegroundPrimary);
+}
+.kanban-filter:hover .filter-label,
+.kanban-filter:hover .filter-value {
+  color: var(--MouseOverPrimary);
+}
+.kanban-filter.active:hover {
+  color: var(--MouseOverPrimary);
+}
+.kanban-filter.active:hover .filter-label,
+.kanban-filter.active:hover .filter-value {
+  color: var(--MouseOverPrimary);
+}
+.kanban-filter::after {
+  font-family: "Mobius-System-Icons";
+  content: "\E00B";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ====== FILTER DROPDOWNS ====== */
+.kanban-filter {
+  position: relative;
+}
+.kanban-filter.active {
+  color: var(--ForegroundAction);
+}
+.kanban-filter.active .filter-label,
+.kanban-filter.active .filter-value {
+  color: var(--ForegroundAction);
+}
+.kanban-filter::after {
+  transition: transform var(--transition-slow);
+}
+.kanban-filter.active::after {
+  transform: rotate(180deg);
+}
+
+.filter-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 180px;
+  background: var(--BackgroundInput);
+  border: 1px solid var(--MouseOverPrimary);
+  border-radius: var(--radius-base);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.13);
+  z-index: var(--z-dropdown);
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, opacity 0.5s ease;
+}
+.kanban-filter.active .filter-dropdown {
+  max-height: 400px;
+  opacity: 1;
+}
+
+.filter-dropdown-option {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  padding: var(--space-lg) var(--space-lg);
+  font: var(--font-normal) var(--size-default) / 1 var(--default-font);
+  color: var(--ForegroundStrong);
+  cursor: pointer;
+  transition: background var(--transition-slow), color var(--transition-slow);
+  white-space: nowrap;
+}
+.filter-dropdown-option:hover {
+  background: var(--MouseOverPrimary);
+  color: var(--SelectionForeground);
+}
+.filter-dropdown-option.selected {
+  background: var(--SelectionPrimary);
+  color: var(--SelectionForeground);
+}
+.filter-dropdown-option.selected:hover {
+  background: var(--MouseOverPrimary);
+  color: var(--SelectionForeground);
+}
+
+/* ====== TABLE PLACEHOLDER ====== */
+.table-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* ====== SIDE NAV ====== */
+.page-layout {
+  display: flex;
+  height: 100%;
+}
+.side-nav {
+  width: 300px;
+  min-width: 300px;
+  background: var(--BackgroundStrongStepOne);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  border-right: 1px solid var(--BorderPrimary, rgba(0,0,0,0.08));
+  transition: width var(--transition-slow), min-width var(--transition-slow);
+}
+.side-nav.collapsed {
+  width: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.side-nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+  padding: 0 15px 0 24px;
+  background: #fdfdfb;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.side-nav-header-title {
+  font: var(--font-light) var(--size-hdrSm) / 1 var(--header-font);
+  color: var(--ForegroundPrimary);
+  text-transform: capitalize;
+}
+.side-nav-header-toggle {
+  font-family: "Mobius-System-Icons";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  color: var(--ForegroundPrimary);
+  -webkit-font-smoothing: antialiased;
+  transition: color var(--transition-slow);
+}
+.side-nav-header-toggle::before {
+  content: "\E009";
+}
+.side-nav-header:hover .side-nav-header-toggle {
+  color: var(--MouseOverPrimary);
+}
+
+.nav-section {
+  padding-top: var(--space-8);
+}
+.nav-section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 44px;
+  padding: 0 10px 0 28px;
+  cursor: pointer;
+  transition: color var(--transition-slow);
+}
+.nav-section-header:hover {
+  color: var(--MouseOverPrimary);
+}
+.nav-section-chevron {
+  font-family: "Mobius-System-Icons";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  transition: transform var(--transition-slow);
+}
+.nav-section-chevron::before {
+  content: "\E00B";
+}
+.nav-section.collapsed .nav-section-chevron {
+  transform: rotate(-90deg);
+}
+.nav-section-title {
+  font: var(--font-bold) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundPrimary);
+  flex: 1;
+}
+.nav-section-header:hover .nav-section-title {
+  color: var(--MouseOverPrimary);
+}
+
+.nav-section-items {
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  max-height: 500px;
+}
+.nav-section.collapsed .nav-section-items {
+  max-height: 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 44px;
+  padding: 0 10px 0 60px;
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundPrimary);
+  cursor: pointer;
+  transition: background var(--transition-slow), color var(--transition-slow);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nav-item:hover {
+  background: #cdeaf6; /* Blue 20% — not yet tokenized in Mobius */
+  color: var(--ForegroundPrimary);
+}
+.nav-item.active {
+  background: var(--SelectionPrimary);
+  color: var(--SelectionForeground);
+}
+.nav-item.active:hover {
+  background: var(--MouseOverPrimary);
+  color: var(--SelectionForeground);
+}
+
+.page-content {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-huge);
+  overflow: auto;
+}
+
+/* ====== CMS TABLE ====== */
+.cms-table {
+  width: 100%;
+  border-radius: var(--radius-base);
+  overflow: hidden;
+  margin-bottom: var(--space-xxl);
+  text-box-trim: both;
+  text-box-edge: cap alphabetic;
+  --col-status: 190px;
+}
+
+/* --- Parent row (section header) --- */
+.table-parent-row {
+  display: flex;
+  align-items: center;
+  height: 87px;
+  background: var(--BackgroundStrong);
+  border-left: 4px solid var(--InformationGreen);
+  cursor: pointer;
+  transition: background var(--transition-slow);
+}
+.table-parent-row:hover {
+  background: var(--BackgroundStepTwo);
+}
+.table-parent-row.status-delayed {
+  border-left-color: var(--InformationOrange);
+}
+.table-parent-row.status-paused {
+  border-left-color: var(--InformationRed);
+}
+.table-parent-row.status-queued {
+  border-left-color: var(--InformationGray, #707070);
+}
+
+/* Chevron (inside info cell) */
+.table-cell-chevron {
+  flex-shrink: 0;
+}
+.table-cell-chevron::before {
+  font-family: "Mobius-System-Icons";
+  content: "\E00B";
+  font-size: 18px;
+  line-height: 0;
+  color: var(--ForegroundWatermark);
+  transition: transform var(--transition-slow);
+  -webkit-font-smoothing: antialiased;
+}
+.table-parent-row.open .table-cell-chevron::before {
+  transform: rotate(180deg);
+}
+
+/* Info cell inner layout (chevron + text) */
+.cell-info-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Generic table cell — base layout only, NO padding here */
+.table-cell {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: stretch;
+}
+
+/* Shared column widths — parent cells */
+.table-cell-info {
+  flex: 5 1 0;
+  min-width: 0;
+  padding: 17px 8px 17px 32px;
+  overflow: hidden;
+}
+.table-cell-location {
+  flex: 2 1 0;
+  min-width: 0;
+  padding: 17px 8px 17px 9px;
+  overflow: hidden;
+}
+.table-cell-progress {
+  flex: 4 1 0;
+  min-width: 0;
+  padding: 17px 8px 17px 9px;
+  overflow: hidden;
+}
+.table-cell-status {
+  width: var(--col-status);
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 10px 15px;
+}
+
+/* Info cell (status label + name + timestamp) */
+.table-cell-info .cell-status-label {
+  font: var(--font-normal) var(--size-default) / 1 var(--default-font);
+  color: var(--ForegroundStrong, #002b45);
+  white-space: nowrap;
+}
+.table-cell-info .cell-name {
+  font: var(--font-light) var(--size-hdrSm) / normal var(--header-font);
+  color: var(--ForegroundPrimary);
+}
+.table-cell-info .cell-name a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--transition-slow);
+}
+.table-cell-info .cell-name a:hover {
+  color: var(--MouseOverPrimary);
+}
+.table-cell-info .cell-timestamp {
+  font: var(--font-normal) var(--size-default) / 1 var(--default-font);
+  color: var(--ForegroundDisabled, #cdcdcd);
+  white-space: nowrap;
+}
+
+/* Location cell */
+.table-cell-location a {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--ForegroundAction);
+  text-decoration: none;
+  font: var(--font-normal) var(--size-default) / 1 var(--default-font);
+  white-space: nowrap;
+  transition: color var(--transition-slow);
+}
+.table-cell-location a::before {
+  font-family: "Mobius-System-Icons";
+  content: "\E84C";
+  font-size: 12px;
+  line-height: 0;
+  -webkit-font-smoothing: antialiased;
+}
+.table-cell-location a:hover {
+  color: var(--MouseOverPrimary);
+}
+
+/* Date + progress cell */
+.table-cell-progress {
+  gap: var(--space-sm);
+}
+.cell-date-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.cell-date-row .cell-date-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  line-height: 0;
+}
+.cell-date-row .cell-date-icon::before {
+  font-family: "Mobius-System-Icons";
+  content: "\E752";
+  font-size: 10px;
+  line-height: 0;
+  color: var(--ForegroundPrimary);
+  -webkit-font-smoothing: antialiased;
+}
+.cell-date-row .cell-date-text {
+  font: var(--font-normal) var(--size-Sm) / 1 var(--default-font);
+  color: var(--ForegroundPrimary);
+  white-space: nowrap;
+}
+.cell-progress-stats {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.cell-progress-stats .stat-primary {
+  font: var(--font-normal) var(--size-Sm) / 1 var(--default-font);
+  color: var(--ForegroundPrimary);
+}
+.cell-progress-stats .stat-eta {
+  font: var(--font-normal) var(--size-Sm) / 1 var(--default-font);
+  color: #80a639;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cell-progress-stats .stat-eta.behind {
+  color: var(--InformationRed);
+}
+
+/* Progress bar (same pattern as kanban cards) */
+.table-parent-row .table-progress-bar {
+  margin-top: 5px;
+}
+.table-progress-bar {
+  height: 5px;
+  width: 100%;
+  background: var(--ForegroundDisabled, #cdcdcd);
+  border-radius: var(--radius-base);
+  overflow: hidden;
+  position: relative;
+}
+.table-progress-bar .bar-delta {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--InformationGreen);
+  border-radius: 100px;
+}
+.table-progress-bar .bar-complete {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--InformationBlue);
+  border-radius: 100px;
+}
+
+/* Status button */
+.status-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 17px;
+  background: var(--BackgroundInput, white);
+  border: 1px solid var(--BackgroundInputOutline, #c7c7c7);
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  min-width: 156px;
+}
+.status-btn .status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--InformationBlue);
+  flex-shrink: 0;
+}
+.status-btn .status-label {
+  flex: 1;
+  font: var(--font-normal) var(--size-default) / 1 var(--default-font);
+  color: var(--InformationBlue);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.status-btn .status-chevron::after {
+  font-family: "Mobius-System-Icons";
+  content: "\E00B";
+  font-size: 14px;
+  line-height: 0;
+  color: var(--ForegroundPrimary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- Child rows (task rows) --- */
+.table-child-rows {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, opacity 0.3s ease;
+}
+.table-parent-row.open + .table-child-rows {
+  max-height: 3000px;
+  opacity: 1;
+}
+
+.table-child-row {
+  display: flex;
+  align-items: center;
+  background: var(--BackgroundStepOne);
+  border-left: 4px solid var(--InformationBlue);
+  min-height: 55px;
+  transition: background var(--transition-slow);
+}
+.table-child-row:hover {
+  background: var(--BackgroundStepTwo);
+}
+.table-child-row.status-green {
+  border-left-color: var(--InformationGreen);
+}
+.table-child-row.status-orange {
+  border-left-color: var(--InformationOrange);
+}
+.table-child-row.status-gray {
+  border-left-color: var(--InformationGray, #707070);
+}
+
+/* Child task name cell */
+.table-child-row .child-cell-task {
+  flex: 5 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 17px 8px 17px 70px;
+  border-left: none;
+  overflow: hidden;
+}
+.child-vehicle-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  height: 25px;
+  border: 1px solid var(--InformationGreen);
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.child-vehicle-icon .icon-glyph {
+  font-family: "Mobius-Icons", "Mobius-System-Icons";
+  font-size: 14px;
+  line-height: 0;
+  color: var(--InformationGreen);
+  opacity: 0.65;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+}
+.table-child-row.status-blue .child-vehicle-icon {
+  border-color: var(--InformationBlue);
+}
+.table-child-row.status-blue .child-vehicle-icon .icon-glyph {
+  color: var(--InformationBlue);
+}
+.table-child-row.status-orange .child-vehicle-icon {
+  border-color: var(--InformationOrange);
+}
+.table-child-row.status-orange .child-vehicle-icon .icon-glyph {
+  color: var(--InformationOrange);
+}
+.table-child-row.status-gray .child-vehicle-icon {
+  border-color: var(--InformationGray, #707070);
+}
+.table-child-row.status-gray .child-vehicle-icon .icon-glyph {
+  color: var(--InformationGray, #707070);
+}
+.child-task-name {
+  font: var(--font-normal) var(--size-default) / 1 var(--default-font);
+  color: var(--ForegroundPrimary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* Child vehicle cell */
+.table-child-row .child-cell-vehicle {
+  flex: 2 1 0;
+  min-width: 0;
+  padding: 17px 8px 17px 9px;
+  overflow: hidden;
+}
+.child-cell-vehicle span {
+  font: var(--font-normal) var(--size-Sm) / 1 var(--default-font);
+  color: var(--ForegroundPrimary);
+}
+
+/* Child progress cell */
+.table-child-row .child-cell-progress {
+  flex: 4 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  padding: 17px 8px 17px 9px;
+  overflow: hidden;
+}
+
+/* Child status button cell */
+.table-child-row .child-cell-status {
+  width: var(--col-status);
+  flex: none;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 10px 15px;
+}
+
+</style>
+</head>
+<body>
+
+<div class="page-layout">
+
+<nav class="side-nav">
+  <div class="side-nav-header">
+    <span class="side-nav-header-title">Tasks</span>
+    <span class="side-nav-header-toggle"></span>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-header">
+      <span class="nav-section-chevron"></span>
+      <span class="nav-section-title">Retention Pond</span>
+    </div>
+    <div class="nav-section-items">
+      <div class="nav-item active">Clear and Grub &#x2013; WP-RET-001</div>
+      <div class="nav-item">Water Truck (Dust Control) &#x2013; WP-RET-002</div>
+      <div class="nav-item">Ripping &#x2013; WP-RET-003</div>
+      <div class="nav-item">Cut &amp; Fill (Bulk) &#x2013; WP-RET-004</div>
+      <div class="nav-item">Haulage (Spoil Export) &#x2013; WP-RET-005</div>
+      <div class="nav-item">Cut &amp; Fill (Rough Shape) &#x2013; WP-RET-007</div>
+      <div class="nav-item">Trenching (Outlet Corridor) &#x2013; WP-RET-008</div>
+      <div class="nav-item">Topping (Finish Shape) &#x2013; WP-RET-009</div>
+      <div class="nav-item">Water Truck (Moisture Conditioning) &#x2013; WP-RET-010</div>
+      <div class="nav-item">Compactor (Berm Lift 1) &#x2013; WP-RET-011</div>
+      <div class="nav-item">Water Truck (Dust Control) &#x2013; WP-RET-012</div>
+      <div class="nav-item">Compactor (Berm Lift 2) &#x2013; WP-RET-013</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-header">
+      <span class="nav-section-chevron"></span>
+      <span class="nav-section-title">Haul Road</span>
+    </div>
+    <div class="nav-section-items">
+      <div class="nav-item">Cut &amp; Fill (Bulk) &#x2013; WP-HR-002</div>
+      <div class="nav-item">Haulage (Import Fill) &#x2013; WP-HR-003</div>
+      <div class="nav-item">Water Truck (Dust Control) &#x2013; WP-HR-004</div>
+      <div class="nav-item">Water Truck (Moisture Conditioning) &#x2013; WP-HR-005</div>
+      <div class="nav-item">Compactor (Lift 1) &#x2013; WP-HR-006</div>
+      <div class="nav-item">Topping (Finish Shape) &#x2013; WP-HR-007</div>
+      <div class="nav-item">Water Truck (Dust Control) &#x2013; WP-HR-008</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-header">
+      <span class="nav-section-chevron"></span>
+      <span class="nav-section-title">East Perimeter</span>
+    </div>
+    <div class="nav-section-items">
+      <div class="nav-item">Compactor</div>
+      <div class="nav-item">Reach Stacker &#x2013; Single Move</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-header">
+      <span class="nav-section-chevron"></span>
+      <span class="nav-section-title">Loading Dock</span>
+    </div>
+    <div class="nav-section-items">
+      <div class="nav-item">Reach Stacker &#x2013; Multiple Moves</div>
+    </div>
+  </div>
+</nav>
+
+<div class="page-content">
+
+<div class="table-section">
+
+<div class="kanban-toolbar">
+
+<div class="view-buttons">
+  <a class="view-btn" href="cms.html" data-view="task">
+    <svg width="21" height="18" viewBox="0 0 21 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="5" height="18" rx="1" fill="currentColor"/>
+      <rect x="8" y="0" width="5" height="12" rx="1" fill="currentColor"/>
+      <rect x="16" y="0" width="5" height="15" rx="1" fill="currentColor"/>
+    </svg>
+    CMS Task View
+  </a>
+  <a class="view-btn active" href="cms-table.html" data-view="table">
+    <svg width="21" height="18" viewBox="0 0 21 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="1" width="21" height="2" rx="1" fill="currentColor"/>
+      <rect x="0" y="6" width="21" height="2" rx="1" fill="currentColor"/>
+      <rect x="0" y="11" width="21" height="2" rx="1" fill="currentColor"/>
+      <rect x="0" y="16" width="21" height="2" rx="1" fill="currentColor"/>
+    </svg>
+    CMS Table
+  </a>
+</div>
+
+<div class="kanban-filters">
+  <div class="kanban-filter" data-filter="operator">
+    <span class="filter-label">Operator:</span><span class="filter-value">All</span>
+    <div class="filter-dropdown">
+      <div class="filter-dropdown-option selected" data-value="All">All</div>
+      <div class="filter-dropdown-option" data-value="Mel Torrie">Mel Torrie</div>
+      <div class="filter-dropdown-option" data-value="Todd Aznavorian">Todd Aznavorian</div>
+      <div class="filter-dropdown-option" data-value="Kevin Westwood">Kevin Westwood</div>
+      <div class="filter-dropdown-option" data-value="Carlo Bos">Carlo Bos</div>
+      <div class="filter-dropdown-option" data-value="Jake Yeagley">Jake Yeagley</div>
+    </div>
+  </div>
+  <div class="kanban-filter" data-filter="vehicle">
+    <span class="filter-label">Vehicle:</span><span class="filter-value">All</span>
+    <div class="filter-dropdown">
+      <div class="filter-dropdown-option selected" data-value="All">All</div>
+      <div class="filter-dropdown-option" data-value="Tractor 9R">Tractor 9R</div>
+      <div class="filter-dropdown-option" data-value="Tractor 8R">Tractor 8R</div>
+      <div class="filter-dropdown-option" data-value="Wheel Loader">Wheel Loader</div>
+      <div class="filter-dropdown-option" data-value="Articulated Dump Truck (ADT)">Articulated Dump Truck (ADT)</div>
+      <div class="filter-dropdown-option" data-value="Water Truck">Water Truck</div>
+      <div class="filter-dropdown-option" data-value="Compactor">Compactor</div>
+      <div class="filter-dropdown-option" data-value="Dozer">Dozer</div>
+      <div class="filter-dropdown-option" data-value="Excavator">Excavator</div>
+    </div>
+  </div>
+  <div class="kanban-filter" data-filter="section">
+    <span class="filter-label">Section:</span><span class="filter-value">All</span>
+    <div class="filter-dropdown">
+      <div class="filter-dropdown-option selected" data-value="All">All</div>
+      <div class="filter-dropdown-option" data-value="Northeast">Northeast</div>
+      <div class="filter-dropdown-option" data-value="North Quadrant">North Quadrant</div>
+      <div class="filter-dropdown-option" data-value="West Wing">West Wing</div>
+      <div class="filter-dropdown-option" data-value="Foundation Zone">Foundation Zone</div>
+      <div class="filter-dropdown-option" data-value="Boundary Line">Boundary Line</div>
+    </div>
+  </div>
+  <div class="kanban-filter" data-filter="task">
+    <span class="filter-label">Task:</span><span class="filter-value">All</span>
+    <div class="filter-dropdown">
+      <div class="filter-dropdown-option selected" data-value="All">All</div>
+      <div class="filter-dropdown-option" data-value="Scraper Cut &amp; Fill">Scraper Cut &amp; Fill</div>
+      <div class="filter-dropdown-option" data-value="Dozer &#x2013; Cut &amp; Fill">Dozer &#x2013; Cut &amp; Fill</div>
+      <div class="filter-dropdown-option" data-value="Dozer &#x2013; Ripping">Dozer &#x2013; Ripping</div>
+      <div class="filter-dropdown-option" data-value="Dozer &#x2013; Topping">Dozer &#x2013; Topping</div>
+      <div class="filter-dropdown-option" data-value="Haulage (ADT)">Haulage (ADT)</div>
+      <div class="filter-dropdown-option" data-value="Water Truck">Water Truck</div>
+      <div class="filter-dropdown-option" data-value="Compactor">Compactor</div>
+      <div class="filter-dropdown-option" data-value="Wheel Loader">Wheel Loader</div>
+      <div class="filter-dropdown-option" data-value="Grubbing">Grubbing</div>
+      <div class="filter-dropdown-option" data-value="Trenching">Trenching</div>
+      <div class="filter-dropdown-option" data-value="Reach Stacker &#x2013; Single Move">Reach Stacker &#x2013; Single Move</div>
+      <div class="filter-dropdown-option" data-value="Reach Stacker &#x2013; Multiple Moves">Reach Stacker &#x2013; Multiple Moves</div>
+    </div>
+  </div>
+  <div class="kanban-filter" data-filter="date">
+    <span class="filter-label">Date:</span><span class="filter-value">Last 7 Days</span>
+    <div class="filter-dropdown">
+      <div class="filter-dropdown-option" data-value="Today">Today</div>
+      <div class="filter-dropdown-option selected" data-value="Last 7 Days">Last 7 Days</div>
+      <div class="filter-dropdown-option" data-value="Last 2 Weeks">Last 2 Weeks</div>
+      <div class="filter-dropdown-option" data-value="Last Month">Last Month</div>
+      <div class="filter-dropdown-option" data-value="All Time">All Time</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- CMS Table -->
+<div class="cms-table">
+
+  <!-- === HAUL ROAD === -->
+  <div class="table-parent-row open" data-section="haul-road">
+    <div class="table-cell table-cell-info">
+      <div class="cell-info-inner">
+        <span class="table-cell-chevron"></span>
+        <div class="cell-info-text">
+          <span class="cell-status-label">In Progress</span>
+          <div class="cell-name">Haul Road</div>
+          <span class="cell-timestamp">2 min ago</span>
+        </div>
+      </div>
+    </div>
+    <div class="table-cell table-cell-location">
+      <a href="#">Haul Road</a>
+    </div>
+    <div class="table-cell table-cell-progress">
+      <div class="cell-date-row">
+        <span class="cell-date-icon"></span>
+        <span class="cell-date-text">Nov 11th, 8:00 &#x2013; Nov 11th, 8:00</span>
+      </div>
+      <div class="cell-progress-stats">
+        <span class="stat-primary">36.5hr In-Progress</span>
+        <span class="stat-eta">4.5hr to Done</span>
+      </div>
+      <div class="table-progress-bar">
+        <div class="bar-delta" style="width: 70%"></div>
+        <div class="bar-complete" style="width: 55%"></div>
+      </div>
+    </div>
+    <div class="table-cell table-cell-status">
+      <div class="status-btn">
+        <span class="status-dot"></span>
+        <span class="status-label">IN PROCESS</span>
+        <span class="status-chevron"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-child-rows">
+    <!-- Row 1: Clear and Grub (green, from Retention Pond context) -->
+    <div class="table-child-row status-green">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Clear and Grub &#x2013; WP-RET-001</span>
+      </div>
+      <div class="child-cell-vehicle"><span>FN- Dozer D-10</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">82% &#x2013; 14.2hr</span>
+          <span class="stat-eta">Done &#x2013; 28m ahead</span>
+        </div>
+        <div class="table-progress-bar">
+          <div class="bar-delta" style="width: 90%"></div>
+          <div class="bar-complete" style="width: 82%"></div>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn">
+          <span class="status-dot"></span>
+          <span class="status-label">IN PROCESS</span>
+          <span class="status-chevron"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Cut & Fill (Bulk) — WP-HR-002 (blue) -->
+    <div class="table-child-row status-blue">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Cut &amp; Fill (Bulk) &#x2013; WP-HR-002</span>
+      </div>
+      <div class="child-cell-vehicle"><span>DOZ-02</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">55% · 2.1h in</span>
+          <span class="stat-eta">7h 52m to Done</span>
+        </div>
+        <div class="table-progress-bar">
+          <div class="bar-delta" style="width: 65%"></div>
+          <div class="bar-complete" style="width: 55%"></div>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn">
+          <span class="status-dot"></span>
+          <span class="status-label">IN PROCESS</span>
+          <span class="status-chevron"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: Haulage (Import Fill) — WP-HR-003 (blue) -->
+    <div class="table-child-row status-blue">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Haulage (Import Fill) &#x2013; WP-HR-003</span>
+      </div>
+      <div class="child-cell-vehicle"><span>ADT-01</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">5% &#x2013; 6h 30m</span>
+          <span class="stat-eta">6h 20m to Done</span>
+        </div>
+        <div class="table-progress-bar">
+          <div class="bar-delta" style="width: 12%"></div>
+          <div class="bar-complete" style="width: 5%"></div>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn">
+          <span class="status-dot"></span>
+          <span class="status-label">IN PROCESS</span>
+          <span class="status-chevron"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 4: Water Truck (Dust Control) — WP-HR-004 (orange/weather) -->
+    <div class="table-child-row status-orange">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Water Truck (Dust Control) &#x2013; WP-HR-004</span>
+      </div>
+      <div class="child-cell-vehicle"><span>WT-01</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">5% &#x2013; 3.4h</span>
+          <span class="stat-eta behind">3h 24min to Done &#x2013; Weather</span>
+        </div>
+        <div class="table-progress-bar">
+          <div class="bar-delta" style="width: 12%"></div>
+          <div class="bar-complete" style="width: 5%"></div>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn">
+          <span class="status-dot"></span>
+          <span class="status-label">IN PROCESS</span>
+          <span class="status-chevron"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 5: Water Truck (Moisture Conditioning) — WP-HR-005 (gray/queued) -->
+    <div class="table-child-row status-gray">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Water Truck (Moisture Conditioning) &#x2013; WP-HR-005</span>
+      </div>
+      <div class="child-cell-vehicle"><span>WT-01</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">0% Queued</span>
+          <span class="stat-eta">ETA 2h · Blocker: Ready after fill placed</span>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn">
+          <span class="status-dot"></span>
+          <span class="status-label">IN PROCESS</span>
+          <span class="status-chevron"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 6: Compactor (Lift 1) — WP-HR-006 (gray/queued) -->
+    <div class="table-child-row status-gray">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Compactor (Lift 1) &#x2013; WP-HR-006</span>
+      </div>
+      <div class="child-cell-vehicle"><span>COM-01</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">0% Queued</span>
+          <span class="stat-eta">ETA 4h · Blocker: Waiting on moisture conditioning</span>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn">
+          <span class="status-dot"></span>
+          <span class="status-label">IN PROCESS</span>
+          <span class="status-chevron"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 7: Topping (Finish Shape) — WP-HR-007 (gray/queued) -->
+    <div class="table-child-row status-gray">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Topping (Finish Shape) &#x2013; WP-HR-007</span>
+      </div>
+      <div class="child-cell-vehicle"><span>DOZ-02</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">0% Queued</span>
+          <span class="stat-eta">ETA 3h · Blocker: Waiting on compaction</span>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn">
+          <span class="status-dot"></span>
+          <span class="status-label">IN PROCESS</span>
+          <span class="status-chevron"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 8: Water Truck (Dust Control) — WP-HR-008 (gray/queued) -->
+    <div class="table-child-row status-gray">
+      <div class="child-cell-task">
+        <div class="child-vehicle-icon"><i class="icon-glyph">&#xE62B;</i></div>
+        <span class="child-task-name">Water Truck (Dust Control) &#x2013; WP-HR-008</span>
+      </div>
+      <div class="child-cell-vehicle"><span>WT-01</span></div>
+      <div class="child-cell-progress">
+        <div class="cell-progress-stats">
+          <span class="stat-primary">0% Queued</span>
+          <span class="stat-eta">ETA 45m · Blocker: Afternoon haul window</span>
+        </div>
+      </div>
+      <div class="child-cell-status">
+        <div class="status-btn">
+          <span class="status-dot"></span>
+          <span class="status-label">IN PROCESS</span>
+          <span class="status-chevron"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.cms-table -->
+
+</div>
+
+<script>
+
+/* Side nav section collapse */
+document.querySelectorAll('.nav-section-header').forEach(header => {
+  header.addEventListener('click', () => {
+    header.closest('.nav-section').classList.toggle('collapsed');
+  });
+});
+
+/* Side nav item selection */
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item.active').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+  });
+});
+
+/* Side nav collapse toggle */
+document.querySelector('.side-nav-header').addEventListener('click', () => {
+  document.querySelector('.side-nav').classList.toggle('collapsed');
+});
+
+/* Filter dropdown toggle */
+document.querySelectorAll('.kanban-filter').forEach(filter => {
+  filter.addEventListener('click', (e) => {
+    if (e.target.classList.contains('filter-dropdown-option')) return;
+    e.stopPropagation();
+    const wasActive = filter.classList.contains('active');
+    document.querySelectorAll('.kanban-filter.active').forEach(f => f.classList.remove('active'));
+    if (!wasActive) filter.classList.add('active');
+  });
+});
+
+/* Dropdown option selection */
+document.querySelectorAll('.filter-dropdown-option').forEach(option => {
+  option.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const filter = option.closest('.kanban-filter');
+    const dropdown = option.closest('.filter-dropdown');
+    dropdown.querySelectorAll('.filter-dropdown-option').forEach(o => o.classList.remove('selected'));
+    option.classList.add('selected');
+    filter.querySelector('.filter-value').textContent = option.dataset.value;
+    filter.classList.remove('active');
+  });
+});
+
+/* Close dropdowns on outside click */
+document.addEventListener('click', () => {
+  document.querySelectorAll('.kanban-filter.active').forEach(f => f.classList.remove('active'));
+});
+
+/* Table parent row toggle */
+document.querySelectorAll('.table-parent-row').forEach(row => {
+  row.addEventListener('click', () => {
+    row.classList.toggle('open');
+  });
+});
+</script>
+
+</div>
+</div>
+</body>
+</html>

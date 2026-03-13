@@ -24,7 +24,141 @@ body {
   color: var(--ForegroundPrimary);
   background: var(--BackgroundPrimary);
   -webkit-font-smoothing: antialiased;
+}
+
+
+/* ====== SIDE NAV ====== */
+.page-layout {
+  display: flex;
+  height: 100%;
+}
+.side-nav {
+  width: 300px;
+  min-width: 300px;
+  background: var(--BackgroundStrongStepOne);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  border-right: 1px solid var(--BorderPrimary, rgba(0,0,0,0.08));
+  transition: width var(--transition-slow), min-width var(--transition-slow);
+}
+.side-nav.collapsed {
+  width: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.side-nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+  padding: 0 15px 0 24px;
+  background: #fdfdfb;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.side-nav-header-title {
+  font: var(--font-light) var(--size-hdrSm) / normal var(--header-font);
+  color: var(--ForegroundPrimary);
+  text-transform: capitalize;
+}
+.side-nav-header-toggle {
+  font-family: "Mobius-System-Icons";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  color: var(--ForegroundPrimary);
+  -webkit-font-smoothing: antialiased;
+  transition: color var(--transition-slow);
+}
+.side-nav-header-toggle::before {
+  content: "\E009";
+}
+.side-nav-header:hover .side-nav-header-toggle {
+  color: var(--MouseOverPrimary);
+}
+
+.nav-section {
+  padding-top: var(--space-8);
+}
+.nav-section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 44px;
+  padding: 0 10px 0 28px;
+  cursor: pointer;
+  transition: color var(--transition-slow);
+}
+.nav-section-header:hover {
+  color: var(--MouseOverPrimary);
+}
+.nav-section-chevron {
+  font-family: "Mobius-System-Icons";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  transition: transform var(--transition-slow);
+}
+.nav-section-chevron::before {
+  content: "\E00B";
+}
+.nav-section.collapsed .nav-section-chevron {
+  transform: rotate(-90deg);
+}
+.nav-section-title {
+  font: var(--font-bold) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundPrimary);
+  flex: 1;
+}
+.nav-section-header:hover .nav-section-title {
+  color: var(--MouseOverPrimary);
+}
+
+.nav-section-items {
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  max-height: 500px;
+}
+.nav-section.collapsed .nav-section-items {
+  max-height: 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 44px;
+  padding: 0 10px 0 60px;
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundPrimary);
+  cursor: pointer;
+  transition: background var(--transition-slow), color var(--transition-slow);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nav-item:hover {
+  color: var(--MouseOverPrimary);
+}
+.nav-item.active {
+  background: var(--SelectionPrimary);
+  color: var(--SelectionForeground);
+}
+.nav-item.active:hover {
+  background: var(--MouseOverPrimary);
+  color: var(--SelectionForeground);
+}
+
+.page-content {
+  flex: 1;
+  min-width: 0;
   padding: var(--space-huge);
+  overflow: auto;
 }
 
 /* ====== CARD COMPONENT ====== */
@@ -360,6 +494,7 @@ body {
   width: 100%;
   flex: 1;
   min-height: 0;
+  padding-bottom: var(--space-xxl);
 }
 
 .kanban-column {
@@ -416,13 +551,56 @@ body {
   overflow-y: auto;
 }
 
+/* ====== TOOLBAR (view buttons + filters) ====== */
+.kanban-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) 0;
+}
+
+/* View toggle buttons */
+.view-buttons {
+  display: flex;
+  gap: var(--space-huge);
+  align-items: flex-start;
+  cursor: pointer;
+}
+.view-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 32px;
+  padding-bottom: var(--space-sm);
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundPrimary);
+  text-decoration: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color var(--transition-slow), border-color var(--transition-slow);
+}
+.view-btn:hover {
+  color: var(--MouseOverPrimary);
+}
+.view-btn.active {
+  color: var(--ForegroundAction);
+  border-bottom-color: var(--ForegroundAction);
+}
+.view-btn.active:hover {
+  color: var(--MouseOverPrimary);
+  border-bottom-color: var(--MouseOverPrimary);
+}
+.view-btn svg {
+  width: 21px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
 /* ====== FILTER BAR ====== */
 .kanban-filters {
   display: flex;
   gap: var(--space-huge);
   align-items: center;
-  justify-content: flex-end;
-  padding: var(--space-md) 0;
 }
 .kanban-filter {
   display: flex;
@@ -529,7 +707,98 @@ body {
 </head>
 <body>
 
+<div class="page-layout">
+
+<nav class="side-nav">
+  <div class="side-nav-header">
+    <span class="side-nav-header-title">Tasks</span>
+    <span class="side-nav-header-toggle"></span>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-header">
+      <span class="nav-section-chevron"></span>
+      <span class="nav-section-title">Retention Pond</span>
+    </div>
+    <div class="nav-section-items">
+      <div class="nav-item active">Clear and Grub &#x2013; WP-RET-001</div>
+      <div class="nav-item">Water Truck (Dust Control) &#x2013; WP-RET-002</div>
+      <div class="nav-item">Ripping &#x2013; WP-RET-003</div>
+      <div class="nav-item">Cut &amp; Fill (Bulk) &#x2013; WP-RET-004</div>
+      <div class="nav-item">Haulage (Spoil Export) &#x2013; WP-RET-005</div>
+      <div class="nav-item">Cut &amp; Fill (Rough Shape) &#x2013; WP-RET-007</div>
+      <div class="nav-item">Trenching (Outlet Corridor) &#x2013; WP-RET-008</div>
+      <div class="nav-item">Topping (Finish Shape) &#x2013; WP-RET-009</div>
+      <div class="nav-item">Water Truck (Moisture Conditioning) &#x2013; WP-RET-010</div>
+      <div class="nav-item">Compactor (Berm Lift 1) &#x2013; WP-RET-011</div>
+      <div class="nav-item">Water Truck (Dust Control) &#x2013; WP-RET-012</div>
+      <div class="nav-item">Compactor (Berm Lift 2) &#x2013; WP-RET-013</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-header">
+      <span class="nav-section-chevron"></span>
+      <span class="nav-section-title">Haul Road</span>
+    </div>
+    <div class="nav-section-items">
+      <div class="nav-item">Cut &amp; Fill (Bulk) &#x2013; WP-HR-002</div>
+      <div class="nav-item">Haulage (Import Fill) &#x2013; WP-HR-003</div>
+      <div class="nav-item">Water Truck (Dust Control) &#x2013; WP-HR-004</div>
+      <div class="nav-item">Water Truck (Moisture Conditioning) &#x2013; WP-HR-005</div>
+      <div class="nav-item">Compactor (Lift 1) &#x2013; WP-HR-006</div>
+      <div class="nav-item">Topping (Finish Shape) &#x2013; WP-HR-007</div>
+      <div class="nav-item">Water Truck (Dust Control) &#x2013; WP-HR-008</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-header">
+      <span class="nav-section-chevron"></span>
+      <span class="nav-section-title">East Perimeter</span>
+    </div>
+    <div class="nav-section-items">
+      <div class="nav-item">Compactor</div>
+      <div class="nav-item">Reach Stacker &#x2013; Single Move</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-header">
+      <span class="nav-section-chevron"></span>
+      <span class="nav-section-title">Loading Dock</span>
+    </div>
+    <div class="nav-section-items">
+      <div class="nav-item">Reach Stacker &#x2013; Multiple Moves</div>
+    </div>
+  </div>
+</nav>
+
+<div class="page-content">
+
 <div class="kanban-section">
+
+<div class="kanban-toolbar">
+
+<div class="view-buttons">
+  <a class="view-btn active" href="cms.html" data-view="task">
+    <svg width="21" height="18" viewBox="0 0 21 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="5" height="18" rx="1" fill="currentColor"/>
+      <rect x="8" y="0" width="5" height="12" rx="1" fill="currentColor"/>
+      <rect x="16" y="0" width="5" height="15" rx="1" fill="currentColor"/>
+    </svg>
+    CMS Task View
+  </a>
+  <a class="view-btn" href="cms-table.html" data-view="table">
+    <svg width="21" height="18" viewBox="0 0 21 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="1" width="21" height="2" rx="1" fill="currentColor"/>
+      <rect x="0" y="6" width="21" height="2" rx="1" fill="currentColor"/>
+      <rect x="0" y="11" width="21" height="2" rx="1" fill="currentColor"/>
+      <rect x="0" y="16" width="21" height="2" rx="1" fill="currentColor"/>
+    </svg>
+    CMS Table
+  </a>
+</div>
 
 <div class="kanban-filters">
   <div class="kanban-filter" data-filter="operator">
@@ -572,12 +841,18 @@ body {
     <span class="filter-label">Task:</span><span class="filter-value">All</span>
     <div class="filter-dropdown">
       <div class="filter-dropdown-option selected" data-value="All">All</div>
-      <div class="filter-dropdown-option" data-value="Clear and Grub">Clear and Grub</div>
-      <div class="filter-dropdown-option" data-value="Site Prep">Site Prep</div>
-      <div class="filter-dropdown-option" data-value="Concrete Pour">Concrete Pour</div>
-      <div class="filter-dropdown-option" data-value="Excavation">Excavation</div>
-      <div class="filter-dropdown-option" data-value="Grading">Grading</div>
-      <div class="filter-dropdown-option" data-value="Paving">Paving</div>
+      <div class="filter-dropdown-option" data-value="Scraper Cut & Fill">Scraper Cut &amp; Fill</div>
+      <div class="filter-dropdown-option" data-value="Dozer – Cut & Fill">Dozer &#x2013; Cut &amp; Fill</div>
+      <div class="filter-dropdown-option" data-value="Dozer – Ripping">Dozer &#x2013; Ripping</div>
+      <div class="filter-dropdown-option" data-value="Dozer – Topping">Dozer &#x2013; Topping</div>
+      <div class="filter-dropdown-option" data-value="Haulage (ADT)">Haulage (ADT)</div>
+      <div class="filter-dropdown-option" data-value="Water Truck">Water Truck</div>
+      <div class="filter-dropdown-option" data-value="Compactor">Compactor</div>
+      <div class="filter-dropdown-option" data-value="Wheel Loader">Wheel Loader</div>
+      <div class="filter-dropdown-option" data-value="Grubbing">Grubbing</div>
+      <div class="filter-dropdown-option" data-value="Trenching">Trenching</div>
+      <div class="filter-dropdown-option" data-value="Reach Stacker – Single Move">Reach Stacker &#x2013; Single Move</div>
+      <div class="filter-dropdown-option" data-value="Reach Stacker – Multiple Moves">Reach Stacker &#x2013; Multiple Moves</div>
     </div>
   </div>
   <div class="kanban-filter" data-filter="date">
@@ -592,6 +867,8 @@ body {
   </div>
 </div>
 
+</div>
+
 <div class="kanban-board">
 
   <!-- TO DO -->
@@ -604,7 +881,7 @@ body {
         <div class="card-hdr">
           <div class="card-hdr-text">
             <div class="card-location"><a href="#">East Lot</a></div>
-            <div class="card-title">Site Prep</div>
+            <div class="card-title">Scraper Cut &amp; Fill</div>
           </div>
           <div class="card-avatar"><img src="Dozer.svg" alt="Dozer"></div>
         </div>
@@ -626,7 +903,7 @@ body {
         <div class="card-hdr">
           <div class="card-hdr-text">
             <div class="card-location"><a href="#">West Ridge</a></div>
-            <div class="card-title">Foundation Layout</div>
+            <div class="card-title">Dozer &#x2013; Ripping</div>
           </div>
           <div class="card-avatar"><img src="Dozer.svg" alt="Dozer"></div>
         </div>
@@ -648,7 +925,7 @@ body {
         <div class="card-hdr">
           <div class="card-hdr-text">
             <div class="card-location"><a href="#">South Access Road</a></div>
-            <div class="card-title">Gravel Delivery</div>
+            <div class="card-title">Dozer &#x2013; Topping</div>
           </div>
           <div class="card-avatar"><img src="Dozer.svg" alt="Dozer"></div>
         </div>
@@ -678,7 +955,7 @@ body {
         <div class="card-hdr">
           <div class="card-hdr-text">
             <div class="card-location"><a href="#">Retention Pond</a></div>
-            <div class="card-title">Clear and Grub</div>
+            <div class="card-title">Grubbing</div>
           </div>
           <div class="card-avatar"><img src="Dozer.svg" alt="Dozer">
             <div class="card-avatar-tooltip">
@@ -709,7 +986,7 @@ body {
         <div class="card-hdr">
           <div class="card-hdr-text">
             <div class="card-location"><a href="#">North Basin</a></div>
-            <div class="card-title">Drainage Install</div>
+            <div class="card-title">Trenching</div>
           </div>
           <div class="card-avatar"><img src="Dozer.svg" alt="Dozer">
             <div class="card-avatar-tooltip">
@@ -748,7 +1025,7 @@ body {
         <div class="card-hdr">
           <div class="card-hdr-text">
             <div class="card-location"><a href="#">Retention Pond</a></div>
-            <div class="card-title">Clear and Grub</div>
+            <div class="card-title">Dozer &#x2013; Cut &amp; Fill</div>
           </div>
           <div class="card-avatar"><img src="Dozer.svg" alt="Dozer">
             <div class="card-avatar-tooltip">
@@ -777,7 +1054,7 @@ body {
         <div class="card-hdr">
           <div class="card-hdr-text">
             <div class="card-location"><a href="#">Central Plaza</a></div>
-            <div class="card-title">Concrete Pour</div>
+            <div class="card-title">Haulage (ADT)</div>
           </div>
           <div class="card-avatar"><img src="Dozer.svg" alt="Dozer">
             <div class="card-avatar-tooltip">
@@ -806,7 +1083,7 @@ body {
         <div class="card-hdr">
           <div class="card-hdr-text">
             <div class="card-location"><a href="#">East Perimeter</a></div>
-            <div class="card-title">Fence Installation</div>
+            <div class="card-title">Compactor</div>
           </div>
           <div class="card-avatar"><img src="Dozer.svg" alt="Dozer">
             <div class="card-avatar-tooltip">
@@ -843,7 +1120,7 @@ body {
         <div class="card-hdr">
           <div class="card-hdr-text">
             <div class="card-location"><a href="#">South Basin</a></div>
-            <div class="card-title">Excavation Phase II</div>
+            <div class="card-title">Water Truck</div>
           </div>
           <div class="card-avatar"><img src="Dozer.svg" alt="Dozer">
             <div class="card-avatar-tooltip">
@@ -874,7 +1151,7 @@ body {
         <div class="card-hdr">
           <div class="card-hdr-text">
             <div class="card-location"><a href="#">East Corridor</a></div>
-            <div class="card-title">Utility Trenching</div>
+            <div class="card-title">Wheel Loader</div>
           </div>
           <div class="card-avatar"><img src="Dozer.svg" alt="Dozer">
             <div class="card-avatar-tooltip">
@@ -913,7 +1190,7 @@ body {
         <div class="card-hdr">
           <div class="card-hdr-text">
             <div class="card-location"><a href="#">North Ridge</a></div>
-            <div class="card-title">Final Grading</div>
+            <div class="card-title">Reach Stacker &#x2013; Single Move</div>
           </div>
           <div class="card-avatar"><img src="Dozer.svg" alt="Dozer">
             <div class="card-avatar-tooltip">
@@ -941,7 +1218,7 @@ body {
         <div class="card-hdr">
           <div class="card-hdr-text">
             <div class="card-location"><a href="#">Loading Dock</a></div>
-            <div class="card-title">Paving Complete</div>
+            <div class="card-title">Reach Stacker &#x2013; Multiple Moves</div>
           </div>
           <div class="card-avatar"><img src="Dozer.svg" alt="Dozer">
             <div class="card-avatar-tooltip">
@@ -1001,6 +1278,27 @@ document.querySelectorAll('.card-details-link').forEach(link => {
 });
 
 
+
+/* Side nav section collapse */
+document.querySelectorAll('.nav-section-header').forEach(header => {
+  header.addEventListener('click', () => {
+    header.closest('.nav-section').classList.toggle('collapsed');
+  });
+});
+
+/* Side nav item selection */
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item.active').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+  });
+});
+
+/* Side nav collapse toggle */
+document.querySelector('.side-nav-header').addEventListener('click', () => {
+  document.querySelector('.side-nav').classList.toggle('collapsed');
+});
+
 /* Filter dropdown toggle */
 document.querySelectorAll('.kanban-filter').forEach(filter => {
   filter.addEventListener('click', (e) => {
@@ -1037,5 +1335,7 @@ document.addEventListener('click', () => {
 });
 </script>
 
+</div>
+</div>
 </body>
 </html>
