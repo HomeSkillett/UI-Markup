@@ -193,19 +193,32 @@ body {
   height: 100%;
 }
 .side-nav {
-  width: 300px;
-  min-width: 300px;
+  width: 0;
+  min-width: 0;
   background: var(--BackgroundStrongStepOne);
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow: hidden;
   border-right: 1px solid var(--BorderPrimary, rgba(0,0,0,0.08));
   transition: width var(--transition-slow), min-width var(--transition-slow);
+  animation: slideInNav 0.8s ease 0.3s forwards;
+}
+.side-nav > * {
+  min-width: 300px;
+}
+@keyframes slideInNav {
+  to { width: 300px; min-width: 300px; overflow-y: auto; }
+}
+.side-nav.loaded {
+  width: 300px;
+  min-width: 300px;
+  overflow-y: auto;
+  animation: none;
 }
 .side-nav.collapsed {
-  width: 0;
-  min-width: 0;
-  overflow: hidden;
+  width: 0 !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
 }
 
 .side-nav-header {
@@ -683,6 +696,7 @@ body {
   height: 59px;
   border-radius: 4px;
   transition: background var(--transition-slow);
+  cursor: pointer;
 }
 /* Zebra striping: odd = StepOne, even = Primary */
 .table-child-row:nth-child(even) {
@@ -795,6 +809,7 @@ body {
   padding: 10px 15px;
   overflow: visible;
 }
+
 
 </style>
 </head>
@@ -2186,9 +2201,15 @@ document.querySelectorAll('.nav-item').forEach(item => {
   });
 });
 
+/* After slide-in animation, lock nav to final state */
+const sideNav = document.querySelector('.side-nav');
+sideNav.addEventListener('animationend', () => {
+  sideNav.classList.add('loaded');
+});
+
 /* Side nav collapse toggle */
 document.querySelector('.side-nav-header').addEventListener('click', () => {
-  document.querySelector('.side-nav').classList.toggle('collapsed');
+  sideNav.classList.toggle('collapsed');
 });
 
 /* Filter dropdown toggle */
@@ -2281,6 +2302,14 @@ document.querySelectorAll('.table-parent-row').forEach(row => {
     } else {
       navSection.classList.add('collapsed');
     }
+  });
+});
+
+/* Child row click — navigate to details (except status button) */
+document.querySelectorAll('.table-child-row').forEach(row => {
+  row.addEventListener('click', (e) => {
+    if (e.target.closest('.status-btn-wrap')) return;
+    window.location.href = 'cms-details.html';
   });
 });
 </script>

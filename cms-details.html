@@ -31,7 +31,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-md) 0;
+  padding: var(--space-md) var(--space-8);
 }
 
 /* View toggle buttons */
@@ -77,19 +77,32 @@ body {
   height: 100%;
 }
 .side-nav {
-  width: 300px;
-  min-width: 300px;
+  width: 0;
+  min-width: 0;
   background: var(--BackgroundStrongStepOne);
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow: hidden;
   border-right: 1px solid var(--BorderPrimary, rgba(0,0,0,0.08));
   transition: width var(--transition-slow), min-width var(--transition-slow);
+  animation: slideInNav 0.8s ease 0.3s forwards;
+}
+.side-nav > * {
+  min-width: 300px;
+}
+@keyframes slideInNav {
+  to { width: 300px; min-width: 300px; overflow-y: auto; }
+}
+.side-nav.loaded {
+  width: 300px;
+  min-width: 300px;
+  overflow-y: auto;
+  animation: none;
 }
 .side-nav.collapsed {
-  width: 0;
-  min-width: 0;
-  overflow: hidden;
+  width: 0 !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
 }
 
 .side-nav-header {
@@ -204,21 +217,22 @@ body {
 .page-content {
   flex: 1;
   min-width: 0;
-  padding: var(--space-huge);
-  overflow: auto;
+  padding: 0;
+  overflow: hidden;
+  background: var(--BackgroundStrongStepOne);
 }
 
 /* ====== DETAILS HEADER ====== */
 .details-section {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  height: 100%;
+  overflow: hidden;
 }
 
 .details-header {
-  background: var(--BackgroundStepOne, #f0f0ee);
+  background: var(--BackgroundStrongStepOne);
   padding: var(--space-3) var(--space-8) var(--space-4) var(--space-8);
-  border-bottom: 1px solid var(--BackgroundInputOutline, #c7c7c7);
 }
 
 .details-header-main {
@@ -227,34 +241,31 @@ body {
   gap: var(--space-5);
 }
 
-/* Vehicle circle icon */
+/* Vehicle circle icon (card-avatar scaled to 100x100) */
 .details-vehicle-icon {
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
-  border: 3px solid var(--InformationBlue);
-  background: var(--BackgroundStrong, white);
+  width: 100px;
+  height: 100px;
+  border-radius: 100px;
+  border: 8px solid var(--InformationBlue);
+  background: var(--MessageDeliveryBackgroundInfo);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  position: relative;
   overflow: hidden;
 }
-.details-vehicle-icon .icon-glyph {
-  font-family: "Mobius-System-Icons";
-  font-style: normal;
-  font-size: 42px;
-  color: var(--InformationBlue);
-  line-height: 1;
-  -webkit-font-smoothing: antialiased;
+.details-vehicle-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* Copy block next to icon */
 .details-header-copy {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: var(--space-1);
+  line-height: 1;
   justify-content: center;
   flex: 1;
   min-width: 0;
@@ -312,9 +323,7 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  line-height: 0;
-  min-height: 1px;
-  min-width: 1px;
+  line-height: normal;
 }
 .status-chevron {
   font-family: "Mobius-System-Icons";
@@ -402,10 +411,124 @@ body {
   padding-left: 130px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: var(--space-1);
   margin-top: var(--space-4);
+  font: var(--font-normal) var(--size-default) / 1 var(--default-font);
+  color: var(--ForegroundPrimary);
+}
+
+/* ====== CONTENT AREA ====== */
+.details-body {
+  background: var(--BackgroundStrong);
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Left content panel */
+.content-panel {
+  flex: 0 0 auto;
+  width: 990px;
+  overflow-y: auto;
+}
+
+/* Right map panel */
+.map-panel {
+  flex: 0 0 600px;
+  max-width: 600px;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  background: var(--BackgroundStrong);
+  margin: var(--space-8) var(--space-8) 0 0;
+}
+.map-panel img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Sections */
+.content-section {
+  padding: var(--space-7) 60px;
+}
+
+.content-section-title {
+  font: var(--font-light) var(--size-hdrMd) / 30px var(--header-font);
+  color: #105f7e;
+  text-transform: uppercase;
+  margin-bottom: 30px;
+}
+
+/* Key-value rows */
+.content-row {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 30px;
+}
+.content-row:last-child {
+  margin-bottom: 0;
+}
+
+.content-col {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  width: 400px;
+  flex-shrink: 0;
+}
+
+.content-label {
+  width: 200px;
+  flex-shrink: 0;
+  text-align: right;
   font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
   color: var(--ForegroundPrimary);
+}
+
+.content-value {
+  width: 250px;
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundAction);
+}
+
+/* ====== ACTIVITY LOG TABLE ====== */
+.log-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--BackgroundStrong);
+}
+
+.log-table thead th {
+  height: 44px;
+  padding: 0 8px;
+  background: var(--BackgroundStepOne);
+  font: var(--font-bold) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundStrong);
+  text-align: left;
+  text-transform: uppercase;
+}
+.log-table thead th:first-child {
+  padding-left: 30px;
+}
+
+.log-table tbody td {
+  height: 44px;
+  padding: 0 8px;
+  background: var(--BackgroundPrimary);
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundPrimary);
+}
+.log-table tbody td:first-child {
+  padding-left: 30px;
+}
+
+/* Zebra striping — even rows get white overlay */
+.log-table tbody tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--BackgroundStrong) 50%, var(--BackgroundPrimary) 50%);
 }
 
 </style>
@@ -525,7 +648,7 @@ body {
 <div class="details-header">
   <div class="details-header-main">
     <div class="details-vehicle-icon">
-      <i class="icon-glyph">&#xE62B;</i>
+      <img src="Dozer.svg" alt="Dozer">
     </div>
     <div class="details-header-copy">
       <span class="details-header-subtitle">Jade - Retention Pond</span>
@@ -554,7 +677,158 @@ body {
   </div>
 </div>
 
-<!-- Details content goes here -->
+<!-- Details Content Area -->
+<div class="details-body">
+
+<!-- Left: Content Sections -->
+<div class="content-panel">
+
+  <!-- Operational Parameters -->
+  <div class="content-section">
+    <div class="content-section-title">Operational Parameters</div>
+    <div class="content-row">
+      <div class="content-col">
+        <span class="content-label">Planned Equipment Types:</span>
+        <span class="content-value">Dozer D8T, Excavator 330, ADT 40T</span>
+      </div>
+      <div class="content-col">
+        <span class="content-label">Acceptable Margin of Error (%):</span>
+        <span class="content-value">&plusmn;2% of polygon area</span>
+      </div>
+    </div>
+    <div class="content-row">
+      <div class="content-col">
+        <span class="content-label">Estimated Start:</span>
+        <span class="content-value">Nov 17, 2025 08:00</span>
+      </div>
+      <div class="content-col">
+        <span class="content-label">Estimated / End Time:</span>
+        <span class="content-value">Nov 17, 2025 17:00</span>
+      </div>
+    </div>
+    <div class="content-row">
+      <div class="content-col">
+        <span class="content-label">Actual Start:</span>
+        <span class="content-value">Nov 17, 2025 08:00</span>
+      </div>
+      <div class="content-col">
+        <span class="content-label">Estimated / End Time:</span>
+        <span class="content-value">In Progress</span>
+      </div>
+    </div>
+    <div class="content-row">
+      <div class="content-col">
+        <span class="content-label">Parent:</span>
+        <span class="content-value">WP-EARTH-001 (Retention Pond)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map Definition -->
+  <div class="content-section">
+    <div class="content-section-title">Map Definition</div>
+    <div class="content-row">
+      <div class="content-col">
+        <span class="content-label">Coordinate Reference System:</span>
+        <span class="content-value">EPSG:4326 (WGS84)</span>
+      </div>
+      <div class="content-col">
+        <span class="content-label">Operational Polygon:</span>
+        <span class="content-value">Polygon_A_Clear_Zone.geojson</span>
+      </div>
+    </div>
+    <div class="content-row">
+      <div class="content-col">
+        <span class="content-label">Polygon Exclusion Areas:</span>
+        <span class="content-value">EPSG:4326 (WGS84)</span>
+      </div>
+      <div class="content-col">
+        <span class="content-label">Path Network:</span>
+        <span class="content-value">SiteA_RoadNetwork.json</span>
+      </div>
+    </div>
+    <div class="content-row">
+      <div class="content-col">
+        <span class="content-label">Existing Surface:</span>
+        <span class="content-value">Surface_PreClear_2025_11_06.dxf</span>
+      </div>
+      <div class="content-col">
+        <span class="content-label">Design Surface:</span>
+        <span class="content-value">Surface_PostClear_2025_11_07.dxf</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Environmental and Safety -->
+  <div class="content-section">
+    <div class="content-section-title">Environmental and Safety</div>
+    <div class="content-row">
+      <div class="content-col">
+        <span class="content-label">Constraints:</span>
+        <span class="content-value">No work after 6 PM;<br>25m buffer from drainage channel.</span>
+      </div>
+      <div class="content-col">
+        <span class="content-label">Obstacle(s):</span>
+        <span class="content-value">Power Line: 12kV overhead;<br>Pipe: Water &#x2013; 1.5m depth</span>
+      </div>
+    </div>
+    <div class="content-row">
+      <div class="content-col">
+        <span class="content-label">Dust Control Requirement:</span>
+        <span class="content-value">Required = True; Linked Task = WT-DUST-001</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Log -->
+  <div class="content-section">
+    <div class="content-section-title">Activity Log</div>
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th>Date/Time</th>
+          <th>Status</th>
+          <th>Task</th>
+          <th>Person</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2026-02-13 14:30</td>
+          <td>Task Received</td>
+          <td>CMS_Task_312 &#x2014; Clear and Grub</td>
+          <td>Carlo H. Bos</td>
+        </tr>
+        <tr>
+          <td>2026-02-13 14:30</td>
+          <td>In-Progress</td>
+          <td>CMS_Task_312 &#x2014; Clear and Grub</td>
+          <td>Carlo H. Bos</td>
+        </tr>
+        <tr>
+          <td>2026-02-13 14:30</td>
+          <td>E-Stop</td>
+          <td>CMS_Task_312 &#x2014; Clear and Grub</td>
+          <td>Carlo H. Bos</td>
+        </tr>
+        <tr>
+          <td>2026-02-13 14:30</td>
+          <td>Completed</td>
+          <td>CMS_Task_312 &#x2014; Clear and Grub</td>
+          <td>Carlo H. Bos</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- Right: Map Panel -->
+<div class="map-panel">
+  <img src="Map.svg" alt="Site Map">
+</div>
+
+</div>
 
 </div>
 
@@ -578,9 +852,15 @@ document.querySelectorAll('.nav-item').forEach(item => {
   });
 });
 
+/* After slide-in animation, lock nav to final state */
+const sideNav = document.querySelector('.side-nav');
+sideNav.addEventListener('animationend', () => {
+  sideNav.classList.add('loaded');
+});
+
 /* Side nav collapse toggle */
 document.querySelector('.side-nav-header').addEventListener('click', () => {
-  document.querySelector('.side-nav').classList.toggle('collapsed');
+  sideNav.classList.toggle('collapsed');
 });
 
 /* Status button toggle */
