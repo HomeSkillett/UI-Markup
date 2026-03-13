@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMS — Details</title>
+<link rel="stylesheet" href="design-tokens.css">
+<style>
+@font-face {
+  font-family: "Mobius-System-Icons";
+  src:
+    url("fonts/Mobius-System-Icons.woff2") format("woff2"),
+    url("fonts/Mobius-System-Icons.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+  font: var(--font-normal) var(--size-default) / var(--lh-default) var(--default-font);
+  color: var(--ForegroundPrimary);
+  background: var(--BackgroundPrimary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ====== TOOLBAR (view buttons only) ====== */
+.kanban-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) 0;
+}
+
+/* View toggle buttons */
+.view-buttons {
+  display: flex;
+  gap: var(--space-huge);
+  align-items: flex-start;
+  cursor: pointer;
+}
+.view-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 32px;
+  padding-bottom: var(--space-sm);
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundPrimary);
+  text-decoration: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color var(--transition-slow), border-color var(--transition-slow);
+}
+.view-btn:hover {
+  color: var(--MouseOverPrimary);
+}
+.view-btn.active {
+  color: var(--ForegroundAction);
+  border-bottom-color: var(--ForegroundAction);
+}
+.view-btn.active:hover {
+  color: var(--MouseOverPrimary);
+  border-bottom-color: var(--MouseOverPrimary);
+}
+.view-btn svg {
+  width: 21px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* ====== SIDE NAV ====== */
+.page-layout {
+  display: flex;
+  height: 100%;
+}
+.side-nav {
+  width: 300px;
+  min-width: 300px;
+  background: var(--BackgroundStrongStepOne);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  border-right: 1px solid var(--BorderPrimary, rgba(0,0,0,0.08));
+  transition: width var(--transition-slow), min-width var(--transition-slow);
+}
+.side-nav.collapsed {
+  width: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.side-nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+  padding: 0 15px 0 24px;
+  background: #fdfdfb;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.side-nav-header-title {
+  font: var(--font-light) var(--size-hdrSm) / 1 var(--header-font);
+  color: var(--ForegroundPrimary);
+  text-transform: capitalize;
+}
+.side-nav-header-toggle {
+  font-family: "Mobius-System-Icons";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  color: var(--ForegroundPrimary);
+  -webkit-font-smoothing: antialiased;
+  transition: color var(--transition-slow);
+}
+.side-nav-header-toggle::before {
+  content: "\E009";
+}
+.side-nav-header:hover .side-nav-header-toggle {
+  color: var(--MouseOverPrimary);
+}
+
+.nav-section {
+  padding-top: var(--space-8);
+}
+.nav-section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 44px;
+  padding: 0 10px 0 28px;
+  cursor: pointer;
+  transition: color var(--transition-slow);
+}
+.nav-section-header:hover {
+  color: var(--MouseOverPrimary);
+}
+.nav-section-chevron {
+  font-family: "Mobius-System-Icons";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  transition: transform var(--transition-slow);
+}
+.nav-section-chevron::before {
+  content: "\E00B";
+}
+.nav-section.collapsed .nav-section-chevron {
+  transform: rotate(-90deg);
+}
+.nav-section-title {
+  font: var(--font-bold) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundPrimary);
+  flex: 1;
+}
+.nav-section-header:hover .nav-section-title {
+  color: var(--MouseOverPrimary);
+}
+
+.nav-section-items {
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.4s ease;
+  max-height: 500px;
+  opacity: 1;
+}
+.nav-section.collapsed .nav-section-items {
+  max-height: 0;
+  opacity: 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 44px;
+  padding: 0 10px 0 60px;
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundPrimary);
+  cursor: pointer;
+  transition: background var(--transition-slow), color var(--transition-slow);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nav-item:hover {
+  background: #cdeaf6;
+  color: var(--ForegroundPrimary);
+}
+.nav-item.active {
+  background: var(--SelectionPrimary);
+  color: var(--SelectionForeground);
+}
+.nav-item.active:hover {
+  background: var(--MouseOverPrimary);
+  color: var(--SelectionForeground);
+}
+
+.page-content {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-huge);
+  overflow: auto;
+}
+
+/* ====== DETAILS HEADER ====== */
+.details-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.details-header {
+  background: var(--BackgroundStepOne, #f0f0ee);
+  padding: var(--space-3) var(--space-8) var(--space-4) var(--space-8);
+  border-bottom: 1px solid var(--BackgroundInputOutline, #c7c7c7);
+}
+
+.details-header-main {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-5);
+}
+
+/* Vehicle circle icon */
+.details-vehicle-icon {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 3px solid var(--InformationBlue);
+  background: var(--BackgroundStrong, white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.details-vehicle-icon .icon-glyph {
+  font-family: "Mobius-System-Icons";
+  font-style: normal;
+  font-size: 42px;
+  color: var(--InformationBlue);
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Copy block next to icon */
+.details-header-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.details-header-subtitle {
+  font: var(--font-light) var(--size-hdrMd) / 30px var(--header-font);
+  color: var(--ForegroundPrimary);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.details-title-row {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+.details-header-title {
+  font: 100 var(--size-hdrLg) / 40px var(--header-font);
+  color: var(--ForegroundPrimary);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Status button (reused from table) */
+.status-btn-wrap { position: relative; }
+.status-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 17px;
+  width: 166px;
+  background: var(--BackgroundInput, white);
+  border: 1px solid var(--BackgroundInputOutline, #c7c7c7);
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  min-width: 156px;
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+}
+.status-btn-wrap.open { z-index: 200; }
+.status-btn-wrap.open .status-btn {
+  border-color: var(--MouseOverPrimary, #0cd0ff);
+  border-radius: 6px 6px 0 0;
+}
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.status-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 0;
+  min-height: 1px;
+  min-width: 1px;
+}
+.status-chevron {
+  font-family: "Mobius-System-Icons";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 14px;
+  color: var(--ForegroundPrimary);
+  -webkit-font-smoothing: antialiased;
+}
+.status-chevron::before { content: "\E00B"; }
+
+/* Status color variants */
+.status-btn[data-status="inprocess"] .status-dot { background: var(--InformationGreen); }
+.status-btn[data-status="inprocess"] .status-label { color: var(--InformationGreen); }
+.status-btn[data-status="paused"] .status-dot { background: var(--InformationOrange); }
+.status-btn[data-status="paused"] .status-label { color: var(--InformationOrange); }
+.status-btn[data-status="completed"] .status-dot { background: var(--InformationGreen); }
+.status-btn[data-status="completed"] .status-label { color: var(--InformationGreen); }
+.status-btn[data-status="canceled"] .status-dot { background: var(--InformationRed); }
+.status-btn[data-status="canceled"] .status-label { color: var(--InformationRed); }
+.status-btn[data-status="delayed"] .status-dot { background: var(--InformationRed); }
+.status-btn[data-status="delayed"] .status-label { color: var(--InformationRed); }
+.status-btn[data-status="todo"] .status-dot { background: var(--InformationGray, #707070); }
+.status-btn[data-status="todo"] .status-label { color: var(--InformationGray, #707070); }
+
+/* Dropdown */
+.status-dropdown {
+  display: none;
+  position: absolute;
+  top: 38px;
+  left: 0;
+  width: 166px;
+  background: var(--BackgroundInput, white);
+  border: 1px solid var(--MouseOverPrimary, #0cd0ff);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.13);
+  z-index: 100;
+  overflow: clip;
+}
+.status-btn-wrap.open .status-dropdown { display: block; }
+.status-dropdown-option {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 12px;
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundStrong, #002b45);
+  cursor: pointer;
+  transition: background var(--transition-slow), color var(--transition-slow);
+}
+.status-dropdown-option:hover {
+  background: var(--MouseOverPrimary);
+  color: var(--SelectionForeground);
+}
+.status-dropdown-option.selected {
+  background: var(--SelectionPrimary, #009fda);
+  color: var(--SelectionForeground, white);
+}
+
+/* Location link */
+.details-header-location {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--ForegroundAction, #0075a1);
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  text-decoration: none;
+  transition: color var(--transition-slow);
+}
+.details-header-location:hover {
+  color: var(--MouseOverPrimary);
+}
+.details-header-location::before {
+  font-family: "Mobius-System-Icons";
+  content: "\E84C";
+  font-size: 12px;
+  line-height: 12px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Meta lines */
+.details-header-meta {
+  padding-left: 130px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: var(--space-4);
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundPrimary);
+}
+
+</style>
+</head>
+<body>
+
+<div class="page-layout">
+
+<nav class="side-nav">
+  <div class="side-nav-header">
+    <span class="side-nav-header-title">Tasks</span>
+    <span class="side-nav-header-toggle"></span>
+  </div>
+
+  <div class="nav-section" data-nav-section="retention-pond">
+    <div class="nav-section-header">
+      <span class="nav-section-chevron"></span>
+      <span class="nav-section-title">Retention Pond</span>
+    </div>
+    <div class="nav-section-items">
+      <div class="nav-item active">Clear and Grub</div>
+      <div class="nav-item">Water Truck (Dust Control)</div>
+      <div class="nav-item">Ripping</div>
+      <div class="nav-item">Cut &amp; Fill (Bulk)</div>
+      <div class="nav-item">Haulage (Spoil Export)</div>
+      <div class="nav-item">Cut &amp; Fill (Rough Shape)</div>
+      <div class="nav-item">Trenching (Outlet Corridor)</div>
+      <div class="nav-item">Topping (Finish Shape)</div>
+      <div class="nav-item">Water Truck (Moisture Conditioning)</div>
+      <div class="nav-item">Compactor (Berm Lift 1)</div>
+      <div class="nav-item">Water Truck (Dust Control)</div>
+      <div class="nav-item">Compactor (Berm Lift 2)</div>
+    </div>
+  </div>
+
+  <div class="nav-section collapsed" data-nav-section="haul-road">
+    <div class="nav-section-header">
+      <span class="nav-section-chevron"></span>
+      <span class="nav-section-title">Haul Road</span>
+    </div>
+    <div class="nav-section-items">
+      <div class="nav-item">Cut &amp; Fill (Bulk)</div>
+      <div class="nav-item">Haulage (Import Fill)</div>
+      <div class="nav-item">Water Truck (Dust Control)</div>
+      <div class="nav-item">Water Truck (Moisture Conditioning)</div>
+      <div class="nav-item">Compactor (Lift 1)</div>
+      <div class="nav-item">Topping (Finish Shape)</div>
+      <div class="nav-item">Water Truck (Dust Control)</div>
+    </div>
+  </div>
+
+  <div class="nav-section collapsed" data-nav-section="east-perimeter">
+    <div class="nav-section-header">
+      <span class="nav-section-chevron"></span>
+      <span class="nav-section-title">East Perimeter</span>
+    </div>
+    <div class="nav-section-items">
+      <div class="nav-item">Compactor</div>
+      <div class="nav-item">Reach Stacker &#x2013; Single Move</div>
+    </div>
+  </div>
+
+  <div class="nav-section collapsed" data-nav-section="loading-dock">
+    <div class="nav-section-header">
+      <span class="nav-section-chevron"></span>
+      <span class="nav-section-title">Loading Dock</span>
+    </div>
+    <div class="nav-section-items">
+      <div class="nav-item">Reach Stacker &#x2013; Multiple Moves</div>
+      <div class="nav-item">Forklift (Pallet Sort)</div>
+      <div class="nav-item">Crane (Container Lift)</div>
+    </div>
+  </div>
+
+  <div class="nav-section collapsed" data-nav-section="stockpile-area">
+    <div class="nav-section-header">
+      <span class="nav-section-chevron"></span>
+      <span class="nav-section-title">Stockpile Area</span>
+    </div>
+    <div class="nav-section-items">
+      <div class="nav-item">Dozer (Push-up)</div>
+      <div class="nav-item">ADT (Material Haul)</div>
+      <div class="nav-item">Water Truck (Dust Control)</div>
+    </div>
+  </div>
+</nav>
+
+<div class="page-content">
+
+<div class="details-section">
+
+<div class="kanban-toolbar">
+
+<div class="view-buttons">
+  <a class="view-btn" href="cms.html" data-view="task">
+    <svg width="21" height="18" viewBox="0 0 21 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="5" height="18" rx="1" fill="currentColor"/>
+      <rect x="8" y="0" width="5" height="12" rx="1" fill="currentColor"/>
+      <rect x="16" y="0" width="5" height="15" rx="1" fill="currentColor"/>
+    </svg>
+    CMS Task View
+  </a>
+  <a class="view-btn" href="cms-table.html" data-view="table">
+    <svg width="21" height="18" viewBox="0 0 21 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="1" width="21" height="2" rx="1" fill="currentColor"/>
+      <rect x="0" y="6" width="21" height="2" rx="1" fill="currentColor"/>
+      <rect x="0" y="11" width="21" height="2" rx="1" fill="currentColor"/>
+      <rect x="0" y="16" width="21" height="2" rx="1" fill="currentColor"/>
+    </svg>
+    CMS Table
+  </a>
+</div>
+
+</div>
+
+<!-- Details Header -->
+<div class="details-header">
+  <div class="details-header-main">
+    <div class="details-vehicle-icon">
+      <i class="icon-glyph">&#xE62B;</i>
+    </div>
+    <div class="details-header-copy">
+      <span class="details-header-subtitle">Jade - Retention Pond</span>
+      <div class="details-title-row">
+        <span class="details-header-title">Clear and Grub &#x2013; CMS_Task_312</span>
+        <div class="status-btn-wrap">
+          <div class="status-btn" data-status="inprocess">
+            <span class="status-dot"></span>
+            <span class="status-label">IN PROCESS</span>
+            <span class="status-chevron"></span>
+          </div>
+          <div class="status-dropdown">
+            <div class="status-dropdown-option selected" data-value="inprocess">In Process</div>
+            <div class="status-dropdown-option" data-value="paused">Paused</div>
+            <div class="status-dropdown-option" data-value="completed">Completed</div>
+            <div class="status-dropdown-option" data-value="canceled">Canceled</div>
+          </div>
+        </div>
+      </div>
+      <a href="#" class="details-header-location">Northeast Section</a>
+    </div>
+  </div>
+  <div class="details-header-meta">
+    <span>Priority: High; Sequence: 001</span>
+    <span>Remove vegetation, topsoil, and debris to establish cleared work zone for grading.</span>
+  </div>
+</div>
+
+<!-- Details content goes here -->
+
+</div>
+
+</div>
+</div>
+
+<script>
+
+/* Side nav section collapse */
+document.querySelectorAll('.nav-section-header').forEach(header => {
+  header.addEventListener('click', () => {
+    header.closest('.nav-section').classList.toggle('collapsed');
+  });
+});
+
+/* Side nav item selection */
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item.active').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+  });
+});
+
+/* Side nav collapse toggle */
+document.querySelector('.side-nav-header').addEventListener('click', () => {
+  document.querySelector('.side-nav').classList.toggle('collapsed');
+});
+
+/* Status button toggle */
+document.querySelectorAll('.status-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const wrap = btn.closest('.status-btn-wrap');
+    const wasOpen = wrap.classList.contains('open');
+    document.querySelectorAll('.status-btn-wrap.open').forEach(w => w.classList.remove('open'));
+    if (!wasOpen) wrap.classList.add('open');
+  });
+});
+
+const statusMap = { inprocess:'IN PROCESS', paused:'PAUSED', completed:'COMPLETED', canceled:'CANCELED', delayed:'DELAYED', todo:'TO DO' };
+document.querySelectorAll('.status-dropdown-option').forEach(option => {
+  option.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const wrap = option.closest('.status-btn-wrap');
+    const btn = wrap.querySelector('.status-btn');
+    const dropdown = wrap.querySelector('.status-dropdown');
+    const value = option.dataset.value;
+    dropdown.querySelectorAll('.status-dropdown-option').forEach(o => o.classList.remove('selected'));
+    option.classList.add('selected');
+    btn.dataset.status = value;
+    btn.querySelector('.status-label').textContent = statusMap[value] || value.toUpperCase();
+    wrap.classList.remove('open');
+  });
+});
+
+/* Close dropdowns on outside click */
+document.addEventListener('click', () => {
+  document.querySelectorAll('.status-btn-wrap.open').forEach(w => w.classList.remove('open'));
+});
+
+</script>
+
+</body>
+</html>
