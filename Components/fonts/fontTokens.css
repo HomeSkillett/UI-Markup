@@ -1,0 +1,36 @@
+/* Font tokens (assumes fonts are installed locally) */
+
+:root {
+  /* Font Family */
+  --default-font: "Roboto Condensed", "Roboto", Arial, sans-serif;
+  --header-font: "Roboto", Arial, sans-serif;
+  --font-quote: Georgia, "Times New Roman", serif;
+  --font-monospace: Consolas, "Courier New", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  --font-icon: "Mobius-System-Icons";
+
+  /* Font Weight (for static fonts) */
+  --font-thin: 100;
+  --font-light: 300;
+  --font-normal: 400;
+  --font-bold: 700;
+
+  /* Font Size */
+  --size-hdrLg: 36px;
+  --size-hdrMd: 24px;
+  --size-hdrSm: 18px;
+  --size-default: 14px;
+  --size-Sm: 11px;
+  --size-meta: 14px;
+  --size-metaSm: 11px;
+  --size-icons: 20px;
+
+  /* Line Height */
+  --lh-hdrLg: 40px;
+  --lh-hdrMd: 30px;
+  --lh-hdrSm: 22px;
+  --lh-default: 20px;
+  --lh-Sm: 14px;
+  --lh-meta: 14px;
+  --lh-metaSm: 11px;
+  --lh-icons: 20px;
+}

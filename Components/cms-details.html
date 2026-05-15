@@ -363,7 +363,7 @@ body {
   border-radius: 0 0 6px 6px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.13);
   z-index: 100;
-  overflow: hidden;
+  overflow: clip;
 }
 .status-btn-wrap.open .status-dropdown { display: block; }
 .status-dropdown-option {
@@ -383,15 +383,6 @@ body {
 .status-dropdown-option.selected {
   background: var(--SelectionPrimary, #009fda);
   color: var(--SelectionForeground, white);
-}
-.status-dropdown-divider {
-  height: 1px;
-  background: var(--InnerLines, #d6dee3);
-}
-.status-dropdown-edit {
-  text-decoration: none;
-  font-weight: var(--font-bold);
-  color: var(--ForegroundAction);
 }
 
 /* Location link */
@@ -674,8 +665,6 @@ body {
             <div class="status-dropdown-option" data-value="paused">Paused</div>
             <div class="status-dropdown-option" data-value="completed">Completed</div>
             <div class="status-dropdown-option" data-value="canceled">Canceled</div>
-            <div class="status-dropdown-divider"></div>
-            <a class="status-dropdown-option status-dropdown-edit" href="cms-task-edit.html">Edit Task</a>
           </div>
         </div>
       </div>
@@ -699,7 +688,7 @@ body {
     <div class="content-section-title">Operational Parameters</div>
     <div class="content-row">
       <div class="content-col">
-        <span class="content-label">Equipment Types:</span>
+        <span class="content-label">Planned Equipment Types:</span>
         <span class="content-value">Dozer D8T, Excavator 330, ADT 40T</span>
       </div>
       <div class="content-col">
@@ -886,7 +875,7 @@ document.querySelectorAll('.status-btn').forEach(btn => {
 });
 
 const statusMap = { inprocess:'IN PROCESS', paused:'PAUSED', completed:'COMPLETED', canceled:'CANCELED', delayed:'DELAYED', todo:'TO DO' };
-document.querySelectorAll('.status-dropdown-option[data-value]').forEach(option => {
+document.querySelectorAll('.status-dropdown-option').forEach(option => {
   option.addEventListener('click', (e) => {
     e.stopPropagation();
     const wrap = option.closest('.status-btn-wrap');

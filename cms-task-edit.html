@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMS — Edit Task</title>
+
+<!-- Shared Mobius tokens (canonical source: ../shared/) -->
+<link rel="stylesheet" href="../shared/fonts/font-imports.css">
+<link rel="stylesheet" href="../shared/fonts/font-tokens.css">
+<link id="mob-theme-link" rel="stylesheet" href="../shared/color-theme-tokens/LightTheme.css">
+
+<!-- Shared Mobius components -->
+<link rel="stylesheet" href="../shared/css/components/field-input.css">
+<link rel="stylesheet" href="../shared/css/components/buttons.css">
+
+<style>
+/* Inline @font-face fallback for Mobius-System-Icons (fixes file:// loading) */
+@font-face {
+  font-family: "Mobius-System-Icons";
+  src:
+    url("../shared/fonts/files/mobius-system-icons.woff2") format("woff2"),
+    url("../shared/fonts/files/mobius-system-icons.woff") format("woff"),
+    url("../shared/fonts/files/mobius-system-icons.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+/* ═══════════════════════════════════════════
+   UI-MARKUP LAYOUT TOKENS
+   ═══════════════════════════════════════════ */
+:root {
+  /* Spacing (Figma node 6200-2597) */
+  --space-str:  1px;
+  --space-1:    4px;
+  --space-2:    8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-7:   32px;
+  --space-8:   40px;
+  --space-9:   48px;
+  --space-10:  56px;
+  --space-11:  64px;
+
+  /* Semantic aliases */
+  --space-sm:   var(--space-1);
+  --space-md:   var(--space-2);
+  --space-lg:   var(--space-3);
+  --space-xl:   var(--space-4);
+  --space-xxl:  var(--space-5);
+  --space-xxxl: var(--space-6);
+  --space-huge: var(--space-7);
+
+  /* Borders & Radii */
+  --radius-none:   0;
+  --radius-sm:     2px;
+  --radius-base:   4px;
+  --radius-md:     6px;
+  --radius-lg:     8px;
+  --radius-xl:     12px;
+  --radius-full:   9999px;
+  --border-width-thin:   1px;
+  --border-width-base:   2px;
+  --border-width-thick:  3px;
+
+  /* Shadows */
+  --shadow-sm:   0 1px 3px var(--ShadowElements);
+  --shadow-base: 0 2px 6px var(--ShadowElements);
+  --shadow-md:   0 4px 12px var(--ShadowElements);
+  --shadow-lg:   0 8px 24px var(--ShadowElements);
+
+  /* Transitions */
+  --transition-fast:   0.1s ease;
+  --transition-base:   0.15s ease;
+  --transition-slow:   0.3s ease;
+
+  /* Z-Index */
+  --z-base:     0;
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-overlay:  300;
+  --z-modal:    400;
+  --z-toast:    500;
+
+  /* Form spacing (from Mobius field-input / spacing-tokens) */
+  --spacing-field:              18px;
+  --spacing-label-to-control-lg: 24px;
+  --spacing-label-to-control-sm: 4px;
+  --spacing-label-to-control:   10px;
+  --field-label-min-width:      130px;
+  --field-label-width:          180px;
+  --field-input-width:          220px;
+  --field-max-width:            300px;
+  --touch:                       44px;
+  --touch-sm:                    36px;
+  --size-6:                       6px;
+  --size-24:                     24px;
+  --border-width:                 1px;
+  --border-width-focused:         2px;
+  --focus-outline-offset:         2px;
+  --opacity-disabled:            0.35;
+  --icon-sm:                     12px;
+  --icon-btn:                    20px;
+  --line-size:                    1px;
+
+  /* Input padding + transition tokens (from spacing-tokens.css) */
+  --padding-lr-md:               0 10px;
+  --transition-mouse-out:        500ms;
+  --transition-mouse-over:       160ms;
+  --transition-mouse-pressed:    160ms;
+  --transition-focus:            160ms;
+  --transition-disable:          100ms;
+  --transition-select:           160ms;
+
+  /* Button tokens (from spacing-tokens.css) */
+  --btn-min-width:               90px;
+  --btn-padding:                 1px 12px 0 12px;
+  --btn-padding-lg:              1px 22px 0 22px;
+  --btn-icon-gap:                8px;
+  --btn-outline-icon-size:       22px;
+  --btn-outline-radius:          12px;
+  --btn-pressed-bg:              color-mix(in srgb, var(--MouseOverPrimary) 75%, black);
+  --spacing-gap-lg:              10px;
+  --opacity-pressed:             0.8;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+  font: var(--font-normal) var(--size-default) / var(--lh-default) var(--default-font);
+  color: var(--ForegroundPrimary);
+  background: var(--BackgroundPrimary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ====== TOOLBAR ====== */
+.kanban-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-8);
+}
+
+.view-buttons {
+  display: flex;
+  gap: var(--space-huge);
+  align-items: flex-start;
+  cursor: pointer;
+}
+.view-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 32px;
+  padding-bottom: var(--space-sm);
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundPrimary);
+  text-decoration: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color var(--transition-slow), border-color var(--transition-slow);
+}
+.view-btn:hover { color: var(--MouseOverPrimary); }
+.view-btn.active { color: var(--ForegroundAction); border-bottom-color: var(--ForegroundAction); }
+.view-btn.active:hover { color: var(--MouseOverPrimary); border-bottom-color: var(--MouseOverPrimary); }
+.view-btn svg { width: 21px; height: 18px; flex-shrink: 0; }
+
+/* ====== SIDE NAV ====== */
+.page-layout { display: flex; height: 100%; }
+.side-nav {
+  width: 0; min-width: 0;
+  background: var(--BackgroundStrongStepOne);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--BorderPrimary, rgba(0,0,0,0.08));
+  transition: width var(--transition-slow), min-width var(--transition-slow);
+  animation: slideInNav 0.8s ease 0.3s forwards;
+}
+.side-nav > * { min-width: 300px; }
+@keyframes slideInNav { to { width: 300px; min-width: 300px; overflow-y: auto; } }
+.side-nav.loaded { width: 300px; min-width: 300px; overflow-y: auto; animation: none; }
+.side-nav.collapsed { width: 0 !important; min-width: 0 !important; overflow: hidden !important; }
+
+.side-nav-header {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 50px; padding: 0 15px 0 24px;
+  background: #fdfdfb; cursor: pointer; flex-shrink: 0;
+}
+.side-nav-header-title { font: var(--font-light) var(--size-hdrSm) / 1 var(--header-font); color: var(--ForegroundPrimary); text-transform: capitalize; }
+.side-nav-header-toggle {
+  font-family: "Mobius-System-Icons"; font-size: 20px; font-style: normal; font-weight: normal;
+  line-height: 1; color: var(--ForegroundPrimary); -webkit-font-smoothing: antialiased;
+  transition: color var(--transition-slow);
+}
+.side-nav-header-toggle::before { content: "\E009"; }
+.side-nav-header:hover .side-nav-header-toggle { color: var(--MouseOverPrimary); }
+
+.nav-section { padding-top: var(--space-8); }
+.nav-section-header {
+  display: flex; align-items: center; gap: 14px; height: 44px;
+  padding: 0 10px 0 28px; cursor: pointer; transition: color var(--transition-slow);
+}
+.nav-section-header:hover { color: var(--MouseOverPrimary); }
+.nav-section-chevron {
+  font-family: "Mobius-System-Icons"; font-size: 14px; font-style: normal;
+  font-weight: normal; line-height: 1; -webkit-font-smoothing: antialiased;
+  transition: transform var(--transition-slow);
+}
+.nav-section-chevron::before { content: "\E00B"; }
+.nav-section.collapsed .nav-section-chevron { transform: rotate(-90deg); }
+.nav-section-title { font: var(--font-bold) var(--size-default) / 1.5 var(--default-font); color: var(--ForegroundPrimary); flex: 1; }
+.nav-section-header:hover .nav-section-title { color: var(--MouseOverPrimary); }
+.nav-section-items { overflow: hidden; transition: max-height 0.4s ease, opacity 0.4s ease; max-height: 500px; opacity: 1; }
+.nav-section.collapsed .nav-section-items { max-height: 0; opacity: 0; }
+
+.nav-item {
+  display: flex; align-items: center; min-width: 0; height: 44px; padding: 0 10px 0 60px;
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundPrimary); cursor: pointer;
+  transition: background var(--transition-slow), color var(--transition-slow);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.nav-item:hover { background: #cdeaf6; }
+.nav-item.active { background: var(--SelectionPrimary); color: var(--SelectionForeground); }
+.nav-item.active:hover { background: var(--MouseOverPrimary); color: var(--SelectionForeground); }
+
+.page-content { flex: 1; min-width: 0; padding: 0; overflow: hidden; background: var(--BackgroundStrongStepOne); }
+
+/* ====== DETAILS HEADER ====== */
+.details-section { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+.details-header { background: var(--BackgroundStrongStepOne); padding: var(--space-3) var(--space-8) var(--space-4) var(--space-8); }
+.details-header-main { display: flex; align-items: flex-start; gap: var(--space-5); }
+
+.details-vehicle-icon {
+  width: 100px; height: 100px; border-radius: 100px;
+  border: 8px solid var(--InformationBlue); background: var(--MessageDeliveryBackgroundInfo);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;
+}
+.details-vehicle-icon img { width: 100%; height: 100%; object-fit: cover; }
+
+.details-header-copy {
+  display: flex; flex-direction: column; gap: var(--space-1); line-height: 1;
+  justify-content: center; flex: 1; min-width: 0;
+}
+.details-header-subtitle {
+  font: var(--font-light) var(--size-hdrMd) / 30px var(--header-font);
+  color: var(--ForegroundPrimary); text-transform: uppercase; white-space: nowrap;
+}
+.details-title-row { display: flex; align-items: center; gap: 30px; }
+.details-header-title {
+  font: 100 var(--size-hdrLg) / 40px var(--header-font);
+  color: var(--ForegroundPrimary); text-transform: uppercase; white-space: nowrap;
+}
+
+/* Status button */
+.status-btn-wrap { position: relative; }
+.status-btn {
+  display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 17px; width: 166px;
+  background: var(--BackgroundInput, white); border: 1px solid var(--BackgroundInputOutline, #c7c7c7);
+  border-radius: 6px; cursor: pointer; white-space: nowrap; min-width: 156px;
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+}
+.status-btn-wrap.open { z-index: 200; }
+.status-btn-wrap.open .status-btn { border-color: var(--MouseOverPrimary, #0cd0ff); border-radius: 6px 6px 0 0; }
+.status-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.status-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: normal; }
+.status-chevron {
+  font-family: "Mobius-System-Icons"; font-size: 14px; font-style: normal;
+  font-weight: normal; line-height: 14px; color: var(--ForegroundPrimary); -webkit-font-smoothing: antialiased;
+}
+.status-chevron::before { content: "\E00B"; }
+
+.status-btn[data-status="inprocess"] .status-dot { background: var(--InformationGreen); }
+.status-btn[data-status="inprocess"] .status-label { color: var(--InformationGreen); }
+.status-btn[data-status="paused"] .status-dot { background: var(--InformationOrange); }
+.status-btn[data-status="paused"] .status-label { color: var(--InformationOrange); }
+.status-btn[data-status="completed"] .status-dot { background: var(--InformationGreen); }
+.status-btn[data-status="completed"] .status-label { color: var(--InformationGreen); }
+.status-btn[data-status="canceled"] .status-dot { background: var(--InformationRed); }
+.status-btn[data-status="canceled"] .status-label { color: var(--InformationRed); }
+.status-btn[data-status="delayed"] .status-dot { background: var(--InformationRed); }
+.status-btn[data-status="delayed"] .status-label { color: var(--InformationRed); }
+.status-btn[data-status="todo"] .status-dot { background: var(--InformationGray, #707070); }
+.status-btn[data-status="todo"] .status-label { color: var(--InformationGray, #707070); }
+
+.status-dropdown {
+  display: none; position: absolute; top: 38px; left: 0; width: 166px;
+  background: var(--BackgroundInput, white); border: 1px solid var(--MouseOverPrimary, #0cd0ff);
+  border-top: none; border-radius: 0 0 6px 6px; box-shadow: 0 0 20px rgba(0,0,0,0.13);
+  z-index: 100; overflow: clip;
+}
+.status-btn-wrap.open .status-dropdown { display: block; }
+.status-dropdown-option {
+  display: flex; align-items: center; height: 44px; padding: 0 12px;
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundStrong, #002b45); cursor: pointer;
+  transition: background var(--transition-slow), color var(--transition-slow);
+}
+.status-dropdown-option:hover { background: var(--MouseOverPrimary); color: var(--SelectionForeground); }
+.status-dropdown-option.selected { background: var(--SelectionPrimary, #009fda); color: var(--SelectionForeground, white); }
+
+.details-header-location {
+  display: flex; align-items: center; gap: 3px;
+  color: var(--ForegroundAction, #0075a1);
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  text-decoration: none; transition: color var(--transition-slow);
+}
+.details-header-location:hover { color: var(--MouseOverPrimary); }
+.details-header-location::before {
+  font-family: "Mobius-System-Icons"; content: "\E84C";
+  font-size: 12px; line-height: 12px; -webkit-font-smoothing: antialiased;
+}
+
+.details-header-meta {
+  padding-left: 130px; display: flex; flex-direction: column; gap: var(--space-1);
+  margin-top: var(--space-4);
+  font: var(--font-normal) var(--size-default) / 1 var(--default-font);
+  color: var(--ForegroundPrimary);
+}
+
+/* ====== CONTENT AREA ====== */
+.details-body { background: var(--BackgroundStrong); flex: 1; display: flex; min-height: 0; overflow: hidden; }
+.content-panel { flex: 1 1 auto; width: 990px; min-height: 0; overflow-y: auto; }
+.map-panel {
+  flex: 0 0 600px; max-width: 600px; position: sticky; top: 0; align-self: flex-start;
+  background: var(--BackgroundStrong); margin: var(--space-8) var(--space-8) 0 0;
+}
+.map-panel img { width: 100%; height: auto; object-fit: contain; }
+
+/* ====== FORM SECTIONS ====== */
+.content-section { padding: var(--space-7) 60px; }
+.content-section + .content-section { border-top: var(--line-size) solid var(--InnerLines, #e0e6e6); }
+
+.content-section-title {
+  font: var(--font-light) var(--size-hdrMd) / 30px var(--header-font);
+  color: #105f7e; text-transform: uppercase; margin-bottom: var(--size-24);
+}
+
+/* Two-column form row */
+.form-row {
+  display: flex;
+  gap: var(--size-24);
+  margin-bottom: var(--spacing-field);
+}
+.form-row:last-child { margin-bottom: 0; }
+
+/* Let mob-field fill its column */
+.form-row .mob-field { flex: 1; min-width: 0; }
+
+/* Inputs use component default width (--field-input-width: 220px) for aligned edges */
+
+/* Label width — use component default (--field-label-min-width: 130px) */
+
+/* ====== ACTION BAR (bottom) ====== */
+.action-bar {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4) 60px;
+  border-top: var(--line-size) solid var(--InnerLines, #e0e6e6);
+  background: var(--BackgroundStrong);
+}
+
+/* ====== HEADER BUTTONS ====== */
+.header-btn-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* ====== ACTIVITY LOG TABLE ====== */
+.log-table { width: 100%; border-collapse: collapse; border-radius: 4px; overflow: hidden; background: var(--BackgroundStrong); }
+.log-table thead th {
+  height: 44px; padding: 0 8px; background: var(--BackgroundStepOne);
+  font: var(--font-bold) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundStrong); text-align: left; text-transform: uppercase;
+}
+.log-table thead th:first-child { padding-left: 30px; }
+.log-table tbody td {
+  height: 44px; padding: 0 8px; background: var(--BackgroundPrimary);
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font); color: var(--ForegroundPrimary);
+}
+.log-table tbody td:first-child { padding-left: 30px; }
+.log-table tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--BackgroundStrong) 50%, var(--BackgroundPrimary) 50%); }
+
+</style>
+</head>
+<body>
+
+<div class="page-layout">
+
+<nav class="side-nav">
+  <div class="side-nav-header">
+    <span class="side-nav-header-title">Tasks</span>
+    <span class="side-nav-header-toggle"></span>
+  </div>
+
+  <div class="nav-section" data-nav-section="retention-pond">
+    <div class="nav-section-header">
+      <span class="nav-section-chevron"></span>
+      <span class="nav-section-title">Retention Pond</span>
+    </div>
+    <div class="nav-section-items">
+      <div class="nav-item active">Clear and Grub</div>
+      <div class="nav-item">Water Truck (Dust Control)</div>
+      <div class="nav-item">Ripping</div>
+      <div class="nav-item">Cut &amp; Fill (Bulk)</div>
+      <div class="nav-item">Haulage (Spoil Export)</div>
+      <div class="nav-item">Cut &amp; Fill (Rough Shape)</div>
+      <div class="nav-item">Trenching (Outlet Corridor)</div>
+      <div class="nav-item">Topping (Finish Shape)</div>
+      <div class="nav-item">Water Truck (Moisture Conditioning)</div>
+      <div class="nav-item">Compactor (Berm Lift 1)</div>
+      <div class="nav-item">Water Truck (Dust Control)</div>
+      <div class="nav-item">Compactor (Berm Lift 2)</div>
+    </div>
+  </div>
+
+  <div class="nav-section collapsed" data-nav-section="haul-road">
+    <div class="nav-section-header">
+      <span class="nav-section-chevron"></span>
+      <span class="nav-section-title">Haul Road</span>
+    </div>
+    <div class="nav-section-items">
+      <div class="nav-item">Cut &amp; Fill (Bulk)</div>
+      <div class="nav-item">Haulage (Import Fill)</div>
+      <div class="nav-item">Water Truck (Dust Control)</div>
+      <div class="nav-item">Water Truck (Moisture Conditioning)</div>
+      <div class="nav-item">Compactor (Lift 1)</div>
+      <div class="nav-item">Topping (Finish Shape)</div>
+      <div class="nav-item">Water Truck (Dust Control)</div>
+    </div>
+  </div>
+
+  <div class="nav-section collapsed" data-nav-section="east-perimeter">
+    <div class="nav-section-header">
+      <span class="nav-section-chevron"></span>
+      <span class="nav-section-title">East Perimeter</span>
+    </div>
+    <div class="nav-section-items">
+      <div class="nav-item">Compactor</div>
+      <div class="nav-item">Reach Stacker &#x2013; Single Move</div>
+    </div>
+  </div>
+
+  <div class="nav-section collapsed" data-nav-section="loading-dock">
+    <div class="nav-section-header">
+      <span class="nav-section-chevron"></span>
+      <span class="nav-section-title">Loading Dock</span>
+    </div>
+    <div class="nav-section-items">
+      <div class="nav-item">Reach Stacker &#x2013; Multiple Moves</div>
+      <div class="nav-item">Forklift (Pallet Sort)</div>
+      <div class="nav-item">Crane (Container Lift)</div>
+    </div>
+  </div>
+
+  <div class="nav-section collapsed" data-nav-section="stockpile-area">
+    <div class="nav-section-header">
+      <span class="nav-section-chevron"></span>
+      <span class="nav-section-title">Stockpile Area</span>
+    </div>
+    <div class="nav-section-items">
+      <div class="nav-item">Dozer (Push-up)</div>
+      <div class="nav-item">ADT (Material Haul)</div>
+      <div class="nav-item">Water Truck (Dust Control)</div>
+    </div>
+  </div>
+</nav>
+
+<div class="page-content">
+<div class="details-section">
+
+<div class="kanban-toolbar">
+  <div class="view-buttons">
+    <a class="view-btn" href="cms.html" data-view="task">
+      <svg width="21" height="18" viewBox="0 0 21 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="5" height="18" rx="1" fill="currentColor"/>
+        <rect x="8" y="0" width="5" height="12" rx="1" fill="currentColor"/>
+        <rect x="16" y="0" width="5" height="15" rx="1" fill="currentColor"/>
+      </svg>
+      CMS Task View
+    </a>
+    <a class="view-btn" href="cms-table.html" data-view="table">
+      <svg width="21" height="18" viewBox="0 0 21 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="1" width="21" height="2" rx="1" fill="currentColor"/>
+        <rect x="0" y="6" width="21" height="2" rx="1" fill="currentColor"/>
+        <rect x="0" y="11" width="21" height="2" rx="1" fill="currentColor"/>
+        <rect x="0" y="16" width="21" height="2" rx="1" fill="currentColor"/>
+      </svg>
+      CMS Table
+    </a>
+  </div>
+</div>
+
+<!-- Details Header -->
+<div class="details-header">
+  <div class="details-header-main">
+    <div class="details-vehicle-icon">
+      <img src="Dozer.svg" alt="Dozer">
+    </div>
+    <div class="details-header-copy">
+      <span class="details-header-subtitle">Jade - Retention Pond</span>
+      <div class="details-title-row">
+        <span class="details-header-title">Clear and Grub &#x2013; CMS_Task_312</span>
+        <div class="header-btn-group">
+          <button class="mob-btn">Save</button>
+          <a class="mob-btn-link" href="cms-details.html">Cancel</a>
+        </div>
+      </div>
+      <a href="#" class="details-header-location">Northeast Section</a>
+    </div>
+  </div>
+  <div class="details-header-meta">
+    <span>Priority: High; Sequence: 001</span>
+    <span>Remove vegetation, topsoil, and debris to establish cleared work zone for grading.</span>
+  </div>
+</div>
+
+<!-- Details Content Area -->
+<div class="details-body">
+
+<!-- Left: Form Sections -->
+<div class="content-panel">
+
+  <!-- Operational Parameters -->
+  <div class="content-section">
+    <div class="content-section-title">Operational Parameters</div>
+
+    <div class="form-row">
+      <div class="mob-field">
+        <label class="mob-field__label">Parent:</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="text" value="WP-EARTH-001 (Retention Pond)" />
+        </div>
+      </div>
+      <div class="mob-field">
+        <label class="mob-field__label">Estimated Start:</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="datetime-local" value="2025-11-17T08:00" />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="mob-field">
+        <label class="mob-field__label">Priority:</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="text" value="High" />
+        </div>
+      </div>
+      <div class="mob-field">
+        <label class="mob-field__label">Actual Start:</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="datetime-local" value="2025-11-17T08:00" />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="mob-field">
+        <label class="mob-field__label">Equipment Types:</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="text" value="Dozer D8T, Excavator 330, ADT 40T" />
+        </div>
+      </div>
+      <div class="mob-field">
+        <label class="mob-field__label">Estimated End:</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="datetime-local" value="2025-11-17T17:00" />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="mob-field">
+        <label class="mob-field__label">Sequence:</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="text" value="001" />
+        </div>
+      </div>
+      <div class="mob-field">
+        <label class="mob-field__label">Actual End:</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="text" placeholder="In Progress" readonly />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="mob-field">
+        <label class="mob-field__label">Margin of Error (%):</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="text" value="&#177;2" />
+          <span class="mob-field__unit">%</span>
+        </div>
+      </div>
+      <div class="mob-field">
+        <label class="mob-field__label">Description:</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="text" value="Remove vegetation, topsoil, and debris to establish cleared work zone for grading." />
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Map Definition -->
+  <div class="content-section">
+    <div class="content-section-title">Map Definition</div>
+
+    <div class="form-row">
+      <div class="mob-field">
+        <label class="mob-field__label">Coordinate Ref System:</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="text" value="EPSG:4326 (WGS84)" />
+        </div>
+      </div>
+      <div class="mob-field">
+        <label class="mob-field__label">Operational Polygon:</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="text" value="Polygon_A_Clear_Zone.geojson" />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="mob-field">
+        <label class="mob-field__label">Polygon Exclusions:</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="text" value="EPSG:4326 (WGS84)" />
+        </div>
+      </div>
+      <div class="mob-field">
+        <label class="mob-field__label">Path Network:</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="text" value="SiteA_RoadNetwork.json" />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="mob-field">
+        <label class="mob-field__label">Existing Surface:</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="text" value="Surface_PreClear_2025_11_06.dxf" />
+        </div>
+      </div>
+      <div class="mob-field">
+        <label class="mob-field__label">Design Surface:</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="text" value="Surface_PostClear_2025_11_07.dxf" />
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Environmental and Safety -->
+  <div class="content-section">
+    <div class="content-section-title">Environmental and Safety</div>
+
+    <div class="form-row">
+      <div class="mob-field">
+        <label class="mob-field__label">Constraints:</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="text" value="No work after 6 PM; 25m buffer from drainage channel" />
+        </div>
+      </div>
+      <div class="mob-field">
+        <label class="mob-field__label">Obstacle(s):</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="text" value="Power Line: 12kV overhead; Pipe: Water &#x2013; 1.5m depth" />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="mob-field">
+        <label class="mob-field__label">Dust Control:</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="text" value="Required" />
+        </div>
+      </div>
+      <div class="mob-field">
+        <label class="mob-field__label">Linked Task:</label>
+        <div class="mob-field__body">
+          <input class="mob-input" type="text" value="WT-DUST-001" />
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Activity Log (read-only) -->
+  <div class="content-section">
+    <div class="content-section-title">Activity Log</div>
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th>Date/Time</th>
+          <th>Status</th>
+          <th>Task</th>
+          <th>Person</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2026-02-13 14:30</td>
+          <td>Task Received</td>
+          <td>CMS_Task_312 &#x2014; Clear and Grub</td>
+          <td>Carlo H. Bos</td>
+        </tr>
+        <tr>
+          <td>2026-02-13 14:30</td>
+          <td>In-Progress</td>
+          <td>CMS_Task_312 &#x2014; Clear and Grub</td>
+          <td>Carlo H. Bos</td>
+        </tr>
+        <tr>
+          <td>2026-02-13 14:30</td>
+          <td>E-Stop</td>
+          <td>CMS_Task_312 &#x2014; Clear and Grub</td>
+          <td>Carlo H. Bos</td>
+        </tr>
+        <tr>
+          <td>2026-02-13 14:30</td>
+          <td>Completed</td>
+          <td>CMS_Task_312 &#x2014; Clear and Grub</td>
+          <td>Carlo H. Bos</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Action Bar -->
+  <div class="action-bar">
+    <button class="mob-btn">Save</button>
+    <a class="mob-btn-link" href="cms-details.html">Cancel</a>
+  </div>
+
+</div>
+
+<!-- Right: Map Panel -->
+<div class="map-panel">
+  <img src="Map.svg" alt="Site Map">
+</div>
+
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+
+/* Side nav section collapse */
+document.querySelectorAll('.nav-section-header').forEach(header => {
+  header.addEventListener('click', () => {
+    header.closest('.nav-section').classList.toggle('collapsed');
+  });
+});
+
+/* Side nav item selection */
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item.active').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+  });
+});
+
+/* After slide-in animation, lock nav to final state */
+const sideNav = document.querySelector('.side-nav');
+sideNav.addEventListener('animationend', () => {
+  sideNav.classList.add('loaded');
+});
+
+/* Side nav collapse toggle */
+document.querySelector('.side-nav-header').addEventListener('click', () => {
+  sideNav.classList.toggle('collapsed');
+});
+
+/* Status button toggle */
+document.querySelectorAll('.status-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const wrap = btn.closest('.status-btn-wrap');
+    const wasOpen = wrap.classList.contains('open');
+    document.querySelectorAll('.status-btn-wrap.open').forEach(w => w.classList.remove('open'));
+    if (!wasOpen) wrap.classList.add('open');
+  });
+});
+
+const statusMap = { inprocess:'IN PROCESS', paused:'PAUSED', completed:'COMPLETED', canceled:'CANCELED', delayed:'DELAYED', todo:'TO DO' };
+document.querySelectorAll('.status-dropdown-option').forEach(option => {
+  option.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const wrap = option.closest('.status-btn-wrap');
+    const btn = wrap.querySelector('.status-btn');
+    const dropdown = wrap.querySelector('.status-dropdown');
+    const value = option.dataset.value;
+    dropdown.querySelectorAll('.status-dropdown-option').forEach(o => o.classList.remove('selected'));
+    option.classList.add('selected');
+    btn.dataset.status = value;
+    btn.querySelector('.status-label').textContent = statusMap[value] || value.toUpperCase();
+    wrap.classList.remove('open');
+  });
+});
+
+/* Close dropdowns on outside click */
+document.addEventListener('click', () => {
+  document.querySelectorAll('.status-btn-wrap.open').forEach(w => w.classList.remove('open'));
+});
+
+</script>
+
+</body>
+</html>

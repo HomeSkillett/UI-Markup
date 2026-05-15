@@ -1,0 +1,251 @@
+/* ============================================================
+   Mobius Design System — Design Tokens
+   Source: Official Mobius CSS package (MobiusCSSFonts.zip)
+
+   Files merged:
+     fontImport.css  — @font-face declarations
+     fontTokens.css  — font families, sizes, weights, line-heights
+     LightTheme.css  — all color tokens (Light theme)
+     + spacing, radii, shadows, transitions (layout tokens)
+
+   Alternate themes available:
+     fonts/DarkTheme.css
+     fonts/BlueTheme.css
+     fonts/BlackoutTheme.css
+     fonts/SunlightTheme.css
+   ============================================================ */
+
+
+/* ═══════════════════════════════════════════
+   FONT IMPORTS — Self-hosted + Google fallback
+   ═══════════════════════════════════════════ */
+
+/* Google Fonts fallback (loads if local files are missing) */
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&family=Roboto:wght@100;300;400;500;700&display=swap');
+
+/* Mobius System Icons — custom icon font */
+@font-face {
+  font-family: "Mobius-System-Icons";
+  src:
+    url("fonts/Mobius-System-Icons.woff2") format("woff2"),
+    url("fonts/Mobius-System-Icons.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+
+:root {
+
+  /* ═══════════════════════════════════════════
+     TYPOGRAPHY — FONT FAMILIES
+     (from fontTokens.css)
+     ═══════════════════════════════════════════ */
+  --default-font:   "Roboto Condensed", "Roboto", Arial, sans-serif;
+  --header-font:    "Roboto", Arial, sans-serif;
+  --font-quote:     Georgia, "Times New Roman", serif;
+  --font-monospace: Consolas, "Courier New", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  --font-icon:      "Mobius-System-Icons";
+
+  /* ═══════════════════════════════════════════
+     TYPOGRAPHY — FONT WEIGHTS
+     ═══════════════════════════════════════════ */
+  --font-thin:   100;
+  --font-light:  300;
+  --font-normal: 400;
+  --font-bold:   700;
+
+  /* ═══════════════════════════════════════════
+     TYPOGRAPHY — FONT SIZES
+     ═══════════════════════════════════════════ */
+  --size-hdrLg:   36px;
+  --size-hdrMd:   24px;
+  --size-hdrSm:   18px;
+  --size-default: 14px;
+  --size-Sm:      11px;
+  --size-meta:    14px;
+  --size-metaSm:  11px;
+  --size-icons:   20px;
+
+  /* ═══════════════════════════════════════════
+     TYPOGRAPHY — LINE HEIGHTS
+     ═══════════════════════════════════════════ */
+  --lh-hdrLg:   40px;
+  --lh-hdrMd:   30px;
+  --lh-hdrSm:   22px;
+  --lh-default: 20px;
+  --lh-Sm:      14px;
+  --lh-meta:    14px;
+  --lh-metaSm:  11px;
+  --lh-icons:   20px;
+
+
+  /* ═══════════════════════════════════════════
+     FOREGROUND COLORS
+     (from LightTheme.css)
+     ═══════════════════════════════════════════ */
+  --ForegroundPrimary:          rgba(85, 85, 85, 1);
+  --ForegroundStrong:           rgba(0, 43, 69, 1);
+  --ForegroundDisabled:         rgba(205, 205, 205, 1);
+  --ForegroundWatermark:        rgba(196, 196, 196, 1);
+
+  --ForegroundInvertPrimary:    rgba(85, 85, 85, 1);
+  --ForegroundInvertStrong:     rgba(0, 43, 69, 1);
+  --ForegroundInvertDisabled:   rgba(205, 205, 205, 1);
+  --ForegroundInvertWatermark:  rgba(112, 112, 112, 1);
+
+  /* ═══════════════════════════════════════════
+     ACTION FOREGROUND COLORS
+     ═══════════════════════════════════════════ */
+  --ForegroundAction:           rgba(0, 117, 161, 1);
+
+  /* ═══════════════════════════════════════════
+     BACKGROUND COLORS
+     ═══════════════════════════════════════════ */
+  --BackgroundPrimary:          rgba(245, 245, 245, 1);
+  --BackgroundStrong:           rgba(255, 255, 255, 1);
+  --BackgroundStrongStepOne:    rgba(240, 240, 240, 1);
+  --BackgroundStepOne:          rgba(251, 251, 249, 1);
+  --BackgroundStepTwo:          rgba(246, 246, 246, 1);
+  --BackgroundOutline:          rgba(199, 199, 199, 0);
+  --BackgroundInput:            rgba(255, 255, 255, 1);
+  --BackgroundInputOutline:     rgba(199, 199, 199, 1);
+
+  --BackgroundInvertPrimary:          rgba(253, 253, 251, 1);
+  --BackgroundInvertStrong:           rgba(243, 243, 243, 1);
+  --BackgroundInvertStrongStepOne:    rgba(255, 255, 255, 1);
+  --BackgroundInvertStepOne:          rgba(255, 255, 253, 1);
+  --BackgroundInvertStepTwo:          rgba(251, 251, 249, 1);
+  --BackgroundInvertOutline:          rgba(199, 199, 199, 1);
+  --BackgroundInvertInput:            rgba(255, 255, 255, 1);
+  --BackgroundInvertInputOutline:     rgba(199, 199, 199, 1);
+
+  /* ═══════════════════════════════════════════
+     INNER LINEWORK
+     ═══════════════════════════════════════════ */
+  --InnerLines:         rgba(224, 230, 230, 1);
+  --InnerLinesInvert:   rgba(224, 230, 230, 1);
+  --InnerLineDividers:  rgba(0, 0, 0, 0);
+
+  /* ═══════════════════════════════════════════
+     SHADOW ELEMENTS
+     ═══════════════════════════════════════════ */
+  --ShadowElements:     rgba(0, 0, 0, 0.133);
+
+  /* ═══════════════════════════════════════════
+     MOUSEOVER COLORS
+     ═══════════════════════════════════════════ */
+  --MouseOverPrimary:           rgba(12, 208, 255, 1);
+  --MouseOverBackground:        rgba(233, 233, 233, 1);
+  --MouseOverInvertBackground:  rgba(229, 229, 229, 1);
+
+  /* ═══════════════════════════════════════════
+     SELECTION COLORS
+     ═══════════════════════════════════════════ */
+  --SelectionPrimary:     rgba(0, 159, 218, 1);
+  --SelectionSecondary:   rgba(0, 120, 164, 1);
+  --SelectionForeground:  rgba(255, 255, 255, 1);
+
+  /* ═══════════════════════════════════════════
+     INFORMATION COLORS (Status)
+     ═══════════════════════════════════════════ */
+  --InformationBlue:          rgba(0, 159, 218, 1);
+  --InformationBlueAlt:       rgba(9, 171, 255, 1);
+  --InformationGreen:         rgba(146, 212, 0, 1);
+  --InformationYellowGreen:   rgba(154, 205, 50, 1);
+  --InformationGreenYellow:   rgba(173, 255, 47, 1);
+  --InformationYellow:        rgba(254, 209, 0, 1);
+  --InformationOrange:        rgba(255, 128, 0, 1);
+  --InformationRed:           rgba(230, 35, 51, 1);
+  --InformationRedAlt:        rgba(255, 0, 0, 1);
+  --InformationPurple:        rgba(196, 153, 247, 1);
+  --InformationForeground:    rgba(0, 0, 0, 1);
+  --InformationBlack:         rgba(204, 204, 204, 1);
+  --InformationGray:          rgba(112, 112, 112, 1);
+  --InformationForegroundAlt: rgba(255, 255, 255, 1);
+
+  /* ═══════════════════════════════════════════
+     MESSAGE DELIVERY COLORS
+     ═══════════════════════════════════════════ */
+  --MessageDeliveryIconInfo:              rgba(0, 159, 218, 1);
+  --MessageDeliveryIconOk:                rgba(146, 212, 0, 1);
+  --MessageDeliveryIconCritical:          rgba(230, 35, 51, 1);
+  --MessageDeliveryIconWarning:           rgba(255, 128, 0, 1);
+  --MessageDeliveryBackgroundInfo:        rgba(215, 237, 247, 1);
+  --MessageDeliveryBackgroundOk:          rgba(230, 242, 227, 1);
+  --MessageDeliveryBackgroundCritical:    rgba(248, 237, 238, 1);
+  --MessageDeliveryBackgroundWarning:     rgba(255, 239, 223, 1);
+  --MessageDeliveryForeground:            rgba(0, 43, 69, 1);
+
+  /* ═══════════════════════════════════════════
+     SCROLLBAR
+     ═══════════════════════════════════════════ */
+  --ScrollBarPrimary: rgba(0, 0, 0, 1);
+
+
+  /* ═══════════════════════════════════════════
+     SPACING
+     Source: Figma Component Library (node 6200-2597)
+     ═══════════════════════════════════════════ */
+  --space-str:  1px;
+  --space-1:    4px;
+  --space-2:    8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-7:   32px;
+  --space-8:   40px;
+  --space-9:   48px;
+  --space-10:  56px;
+  --space-11:  64px;
+
+  /* Semantic aliases — quick-reference helpers */
+  --space-sm:   var(--space-1);   /*  4px */
+  --space-md:   var(--space-2);   /*  8px */
+  --space-lg:   var(--space-3);   /* 12px */
+  --space-xl:   var(--space-4);   /* 16px */
+  --space-xxl:  var(--space-5);   /* 20px */
+  --space-xxxl: var(--space-6);   /* 24px */
+  --space-huge: var(--space-7);   /* 32px */
+
+  /* ═══════════════════════════════════════════
+     BORDERS & RADII
+     ═══════════════════════════════════════════ */
+  --radius-none:   0;
+  --radius-sm:     2px;
+  --radius-base:   4px;
+  --radius-md:     6px;
+  --radius-lg:     8px;
+  --radius-xl:     12px;
+  --radius-full:   9999px;
+
+  --border-width-thin:   1px;
+  --border-width-base:   2px;
+  --border-width-thick:  3px;
+
+  /* ═══════════════════════════════════════════
+     SHADOWS
+     ═══════════════════════════════════════════ */
+  --shadow-sm:   0 1px 3px var(--ShadowElements);
+  --shadow-base: 0 2px 6px var(--ShadowElements);
+  --shadow-md:   0 4px 12px var(--ShadowElements);
+  --shadow-lg:   0 8px 24px var(--ShadowElements);
+
+  /* ═══════════════════════════════════════════
+     TRANSITIONS
+     ═══════════════════════════════════════════ */
+  --transition-fast:   0.1s ease;
+  --transition-base:   0.15s ease;
+  --transition-slow:   0.3s ease;
+
+  /* ═══════════════════════════════════════════
+     Z-INDEX
+     ═══════════════════════════════════════════ */
+  --z-base:     0;
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-overlay:  300;
+  --z-modal:    400;
+  --z-toast:    500;
+}

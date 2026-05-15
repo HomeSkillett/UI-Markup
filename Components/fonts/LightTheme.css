@@ -1,0 +1,307 @@
+:root {
+
+  /* Foreground Colors */
+  --ForegroundPrimary: rgba(85, 85, 85, 1);
+  --ForegroundStrong: rgba(0, 43, 69, 1);
+  --ForegroundDisabled: rgba(205, 205, 205, 1);
+  --ForegroundWatermark: rgba(196, 196, 196, 1);
+
+  /* Invert Foreground Colors */
+  --ForegroundInvertPrimary: rgba(85, 85, 85, 1);
+  --ForegroundInvertStrong: rgba(0, 43, 69, 1);
+  --ForegroundInvertDisabled: rgba(205, 205, 205, 1);
+  --ForegroundInvertWatermark: rgba(112, 112, 112, 1);
+
+  /* Action Foreground Colors */
+  --ForegroundAction: rgba(0, 117, 161, 1);
+
+  /* Background Colors */
+  --BackgroundPrimary: rgba(245, 245, 245, 1);
+  --BackgroundStrong: rgba(255, 255, 255, 1);
+  --BackgroundStrongStepOne: rgba(240, 240, 240, 1);
+  --BackgroundStepOne: rgba(251, 251, 249, 1);
+  --BackgroundStepTwo: rgba(246, 246, 246, 1);
+  --BackgroundOutline: rgba(199, 199, 199, 0);
+  --BackgroundInput: rgba(255, 255, 255, 1);
+  --BackgroundInputOutline: rgba(199, 199, 199, 1);
+
+  /* Invert Background Colors */
+  --BackgroundInvertPrimary: rgba(253, 253, 251, 1);
+  --BackgroundInvertStrong: rgba(243, 243, 243, 1);
+  --BackgroundInvertStrongStepOne: rgba(255, 255, 255, 1);
+  --BackgroundInvertStepOne: rgba(255, 255, 253, 1);
+  --BackgroundInvertStepTwo: rgba(251, 251, 249, 1);
+  --BackgroundInvertOutline: rgba(199, 199, 199, 1);
+  --BackgroundInvertInput: rgba(255, 255, 255, 1);
+  --BackgroundInvertInputOutline: rgba(199, 199, 199, 1);
+
+  /* Inner Linework Colors */
+  --InnerLines: rgba(224, 230, 230, 1);
+  --InnerLinesInvert: rgba(224, 230, 230, 1);
+  --InnerLineDividers: rgba(0, 0, 0, 0);
+
+  /* Shadow Element Colors */
+  --ShadowElements: rgba(0, 0, 0, 0.133);
+
+  /* MouseOver Colors */
+  --MouseOverPrimary: rgba(12, 208, 255, 1);
+  --MouseOverBackground: rgba(233, 233, 233, 1);
+  --MouseOverInvertBackground: rgba(229, 229, 229, 1);
+
+  /* Selection Colors */
+  --SelectionPrimary: rgba(0, 159, 218, 1);
+  --SelectionSecondary: rgba(0, 120, 164, 1);
+  --SelectionForeground: rgba(255, 255, 255, 1);
+
+  /* ScrollBar Colors */
+  --ScrollBarPrimary: rgba(0, 0, 0, 1);
+
+  /* Information Colors */
+  --InformationBlue: rgba(0, 159, 218, 1);
+  --InformationBlueAlt: rgba(9, 171, 255, 1);
+  --InformationGreen: rgba(146, 212, 0, 1);
+  --InformationYellowGreen: rgba(154, 205, 50, 1);
+  --InformationGreenYellow: rgba(173, 255, 47, 1);
+  --InformationYellow: rgba(254, 209, 0, 1);
+  --InformationOrange: rgba(255, 128, 0, 1);
+  --InformationRed: rgba(230, 35, 51, 1);
+  --InformationRedAlt: rgba(255, 0, 0, 1);
+  --InformationPurple: rgba(196, 153, 247, 1);
+  --InformationForeground: rgba(0, 0, 0, 1);
+  --InformationBlack: rgba(204, 204, 204, 1);
+  --InformationGray: rgba(112, 112, 112, 1);
+  --InformationForegroundAlt: rgba(255, 255, 255, 1);
+
+  /* Message Delivery Colors */
+  --MessageDeliveryIconInfo: rgba(0, 159, 218, 1);
+  --MessageDeliveryIconOk: rgba(146, 212, 0, 1);
+  --MessageDeliveryIconCritical: rgba(230, 35, 51, 1);
+  --MessageDeliveryIconWarning: rgba(255, 128, 0, 1);
+  --MessageDeliveryBackgroundInfo: rgba(215, 237, 247, 1);
+  --MessageDeliveryBackgroundOk: rgba(230, 242, 227, 1);
+  --MessageDeliveryBackgroundCritical: rgba(248, 237, 238, 1);
+  --MessageDeliveryBackgroundWarning: rgba(255, 239, 223, 1);
+  --MessageDeliveryForeground: rgba(0, 43, 69, 1);
+
+  /* Gauge Colors */
+  --GaugeBackground: rgba(255, 255, 253, 1);
+  --GaugeForeground: rgba(118, 118, 118, 1);
+  --GaugeValueForeground: rgba(0, 43, 69, 1);
+  --GaugeDataBackground: rgba(244, 244, 244, 1);
+  --GaugeDataForeground: rgba(214, 220, 220, 1);
+  --GaugeDataTick: rgba(224, 230, 230, 1);
+  --GaugeStatusUnknown: rgba(204, 204, 204, 1);
+  --GaugeStatusOK: rgba(146, 212, 0, 1);
+  --GaugeStatusWarning: rgba(255, 128, 0, 1);
+  --GaugeStatusCritical: rgba(230, 35, 51, 1);
+  --GaugeInteraction: rgba(0, 159, 218, 1);
+  --GaugeEditModeBackground: rgba(243, 243, 243, 0.2);
+  --GaugeEditModeBorder: rgba(224, 224, 224, 0.533);
+  --GaugeEditModeSelectedBackground: rgba(0, 159, 218, 0.059);
+  --GaugeEditModeSelectedBorder: rgba(0, 159, 218, 0.2);
+
+  /* Gauge Invert Colors */
+  --GaugeInvertBackground: rgba(255, 255, 253, 1);
+  --GaugeInvertForeground: rgba(118, 118, 118, 1);
+  --GaugeInvertValueForeground: rgba(0, 43, 69, 1);
+  --GaugeInvertDataBackground: rgba(244, 244, 244, 1);
+  --GaugeInvertDataForeground: rgba(214, 220, 220, 1);
+  --GaugeInvertDataTick: rgba(203, 203, 202, 1);
+  --GaugeInvertStatusUnknown: rgba(204, 204, 204, 1);
+  --GaugeInvertStatusOK: rgba(146, 212, 0, 1);
+  --GaugeInvertStatusWarning: rgba(255, 128, 0, 1);
+  --GaugeInvertStatusCritical: rgba(230, 35, 51, 1);
+  --GaugeInvertInteraction: rgba(0, 159, 218, 1);
+  --GaugeInvertEditModeBackground: rgba(243, 243, 243, 0.2);
+  --GaugeInvertEditModeBorder: rgba(224, 224, 224, 0.533);
+  --GaugeInvertEditModeSelectedBackground: rgba(0, 159, 218, 0.059);
+  --GaugeInvertEditModeSelectedBorder: rgba(0, 159, 218, 0.2);
+
+  /* Gauge Dark Colors */
+  --GaugeDarkBackground: rgba(47, 47, 47, 1);
+  --GaugeDarkForeground: rgba(223, 229, 229, 1);
+  --GaugeDarkValueForeground: rgba(0, 43, 69, 1);
+  --GaugeDarkDataBackground: rgba(32, 32, 32, 1);
+  --GaugeDarkDataForeground: rgba(15, 15, 15, 1);
+  --GaugeDarkDataTick: rgba(68, 68, 68, 0.6);
+  --GaugeDarkStatusUnknown: rgba(153, 153, 153, 1);
+  --GaugeDarkStatusOK: rgba(146, 212, 0, 1);
+  --GaugeDarkStatusWarning: rgba(255, 128, 0, 1);
+  --GaugeDarkStatusCritical: rgba(230, 35, 51, 1);
+  --GaugeDarkInteraction: rgba(0, 159, 218, 1);
+  --GaugeDarkEditModeBackground: rgba(10, 10, 10, 0.2);
+  --GaugeDarkEditModeBorder: rgba(10, 10, 10, 0.533);
+  --GaugeDarkEditModeSelectedBackground: rgba(0, 159, 218, 0.059);
+  --GaugeDarkEditModeSelectedBorder: rgba(0, 159, 218, 0.2);
+
+  /* Map Shape Colors */
+  --MapBackground: rgba(245, 245, 245, 1);
+  --MapGridLines: rgba(0, 0, 0, 0.063);
+  --RoadShapeOutline: rgba(187, 187, 187, 1);
+  --RoadShapeFill: rgba(255, 255, 255, 1);
+  --IntersectionShapeOutline: rgba(153, 153, 153, 1);
+  --IntersectionShapeInnerBorder: rgba(255, 255, 255, 1);
+  --IntersectionShapeFill: rgba(204, 204, 204, 1);
+  --ReferenceShapeOutline: rgba(204, 204, 204, 1);
+  --ReferenceShapeFill: rgba(204, 204, 204, 0.267);
+  --RoadShapeDoubleCenterLine: rgba(254, 209, 0, 1);
+  --RoadShapeEdgeFill: rgba(251, 174, 49, 0.867);
+  --DriveableShapeOutline: rgba(204, 204, 204, 1);
+  --DriveableShapeFill: rgba(153, 153, 153, 0.098);
+  --ObstacleShapeOutline: rgba(221, 221, 221, 1);
+  --ObstacleShapeFill: rgba(245, 245, 245, 1);
+  --FailureShapeOutline: rgba(237, 41, 57, 1);
+  --FailureShapeFill: rgba(204, 204, 204, 0.125);
+  --MapBuilderObstacleShapeOutline: rgba(237, 41, 57, 1);
+  --MapBuilderObstacleShapeFill: rgba(237, 41, 57, 0.439);
+  --AreaCoverageShapeOutline: rgba(177, 227, 62, 0.8);
+  --AreaCoverageShapeFill: rgba(177, 227, 62, 0.467);
+  --AreaCoverageProgressShapeOutline: rgba(170, 170, 170, 0.365);
+  --AreaCoverageProgressShapeFill: rgba(170, 170, 170, 0.247);
+  --FixedRowShapeOutline: rgba(146, 212, 0, 0.667);
+  --FixedRowShapeFill: rgba(146, 212, 0, 0.247);
+  --FixedRowShapeActiveOutline: rgba(146, 212, 0, 0.247);
+  --FixedRowShapeActiveFill: rgba(146, 212, 0, 0.498);
+  --FixedRowShapePlanningOutline: rgba(196, 153, 247, 0.867);
+  --FixedRowShapePlanningFill: rgba(196, 153, 247, 0.498);
+  --FixedRowShapePlannedOutline: rgba(146, 212, 0, 1);
+  --FixedRowShapePlannedFill: rgba(146, 212, 0, 0.561);
+  --FixedRowShapeSelectedOutline: rgba(254, 209, 0, 0.867);
+  --FixedRowShapeSelectedFill: rgba(254, 209, 0, 0.498);
+  --FixedRowShapeCompleteOutline: rgba(170, 170, 170, 0.867);
+  --FixedRowShapeCompleteFill: rgba(170, 170, 170, 0.498);
+  --FixedRowShapeFailedOutline: rgba(237, 41, 57, 0.867);
+  --FixedRowShapeFailedFill: rgba(237, 41, 57, 0.498);
+  --StationOutline: rgba(255, 128, 0, 0.749);
+  --StationFill: rgba(255, 128, 0, 0.098);
+  --DisengageShapeOutline: rgba(0, 126, 174, 0.749);
+  --DisengageShapeFill: rgba(78, 182, 221, 0.267);
+  --AcceleratedMechanicalConsolidationShapeOutline: rgba(220, 214, 178, 1);
+  --AcceleratedMechanicalConsolidationShapeFill: rgba(183, 65, 14, 1);
+  --AvoidShapeOutline: rgba(220, 214, 178, 1);
+  --AvoidShapeFill: rgba(220, 214, 178, 0.467);
+  --BarrierShapeOutline: rgba(221, 221, 221, 1);
+  --BarrierShapeFill: rgba(245, 245, 245, 1);
+  --BunkerShapeOutline: rgba(220, 214, 178, 1);
+  --BunkerShapeFill: rgba(245, 242, 224, 0.933);
+  --GreenShapeOutline: rgba(146, 212, 0, 1);
+  --GreenShapeFill: rgba(214, 239, 159, 1);
+  --NegativeObstacleShapeOutline: rgba(237, 41, 57, 1);
+  --NegativeObstacleShapeFill: rgba(103, 180, 234, 1);
+  --RoughShapeOutline: rgba(0, 0, 0, 0.467);
+  --RoughShapeFill: rgba(0, 0, 0, 0.2);
+  --MapBuilderBarrierShapeOutline: rgba(237, 41, 57, 1);
+  --MapBuilderBarrierShapeFill: rgba(237, 41, 57, 0.439);
+  --ConvoySpacingShapeFill: rgba(220, 213, 180, 1);
+  --MapLabelOutline: rgba(212, 212, 212, 0.902);
+  --WaterHazardShapeOutline: rgba(103, 180, 234, 1);
+  --WaterHazardShapeFill: rgba(208, 241, 252, 1);
+
+  /* Path Assignment Colors */
+  --PathAssignment_Planning_Connection_Outline: rgba(151, 128, 192, 1);
+  --PathAssignment_Planning_Outline: rgba(192, 157, 243, 1);
+  --PathAssignment_Planning_Fill: rgba(192, 157, 243, 0.467);
+  --PathAssignment_Planned_Connection_NotSelected_Outline: rgba(128, 166, 57, 0.333);
+  --PathAssignment_Planned_NotSelected_Outline: rgba(153, 209, 53, 0.333);
+  --PathAssignment_Planned_NotSelected_Fill: rgba(153, 209, 53, 0.133);
+  --PathAssignment_Planned_Connection_Selected_Outline: rgba(128, 166, 57, 1);
+  --PathAssignment_Planned_Selected_Outline: rgba(153, 209, 53, 1);
+  --PathAssignment_Planned_Selected_Fill: rgba(153, 209, 53, 0.467);
+  --PathAssignment_Executing_Connection_NotSelected_Outline: rgba(222, 164, 39, 0.333);
+  --PathAssignment_Executing_NotSelected_Outline: rgba(254, 209, 0, 0.333);
+  --PathAssignment_Executing_NotSelected_Fill: rgba(254, 209, 0, 0.133);
+  --PathAssignment_Executing_Connection_Selected_Outline: rgba(222, 164, 39, 1);
+  --PathAssignment_Executing_Selected_Outline: rgba(254, 209, 0, 1);
+  --PathAssignment_Executing_Selected_Fill: rgba(254, 209, 0, 0.467);
+  --PathAssignment_Error_Connection_Outline: rgba(180, 25, 44, 1);
+  --PathAssignment_Error_Outline: rgba(237, 41, 57, 1);
+  --PathAssignment_Error_Fill: rgba(237, 41, 57, 0.467);
+
+  /* Path Builder Path Colors */
+  --PathNormalOutline: rgba(100, 100, 100, 1);
+  --PathNormalFill: rgba(100, 100, 100, 0.467);
+  --PathSelectedOutline: rgba(0, 159, 218, 1);
+  --PathSelectedFill: rgba(0, 159, 218, 0.467);
+  --PathErrorOutline: rgba(237, 41, 57, 1);
+  --PathErrorFill: rgba(237, 41, 57, 0.467);
+  --PathHistory: rgba(0, 0, 0, 0.2);
+  --PathReverse: rgba(169, 169, 169, 1);
+  --PathAction: rgba(100, 100, 100, 1);
+
+  /* Vehicle Map Colors */
+  --VehicleSelectionFill: rgba(0, 159, 218, 0.498);
+  --VehicleSelectionOutline: rgba(0, 159, 218, 1);
+  --VehicleEStopFill: rgba(237, 41, 57, 0.498);
+  --VehicleEStopOutline: rgba(237, 41, 57, 1);
+  --VehicleConditionalStopFill: rgba(255, 128, 0, 0.498);
+  --VehicleConditionalStopOutline: rgba(255, 128, 0, 1);
+  --VehiclePoweringFill: rgba(196, 153, 247, 0.498);
+  --VehiclePoweringOutline: rgba(196, 153, 247, 1);
+  --VehicleNoHeadingFill: rgba(112, 112, 112, 0.333);
+  --VehicleNoHeadingOutline: rgba(112, 112, 112, 1);
+
+  /* Load & Dump Zone Map Colors */
+  --LoadDumpZoneFill: rgba(220, 214, 178, 0.498);
+  --LoadDumpZoneOutline: rgba(220, 214, 178, 1);
+  --LoadDumpZoneCautionArea: rgba(254, 209, 0, 1);
+  --LoadDumpZoneCautionAreaAlt: rgba(102, 102, 102, 1);
+  --LoadDumpZoneSpotArrowOutline: rgba(102, 102, 102, 1);
+  --LoadDumpZoneSpotArrowFill: rgba(254, 209, 0, 1);
+  --LoadDumpZoneTentativeSpotArrowOutline: rgba(196, 153, 247, 1);
+  --LoadDumpZoneTentativeSpotArrowFill: rgba(196, 153, 247, 0.498);
+  --LoadDumpZoneTentativeSpotPoint: rgba(196, 153, 247, 1);
+  --LoadDumpZoneQuePointDot: rgba(146, 212, 0, 0.867);
+  --LoadDumpZoneQuePointFill: rgba(251, 250, 245, 0.467);
+  --LoadDumpZoneQuePointOutline: rgba(146, 212, 0, 1);
+  --LoadDumpZoneEmptyDumpPointFill: rgba(251, 250, 245, 1);
+  --LoadDumpZoneEmptyDumpPointOutline: rgba(220, 214, 178, 1);
+  --LoadDumpZoneSkippedDumpPointFill: rgba(237, 235, 220, 1);
+  --LoadDumpZoneSkippedDumpPointOutline: rgba(213, 206, 172, 1);
+  --LoadDumpZoneFullDumpPointFillOne: rgba(214, 239, 159, 1);
+  --LoadDumpZoneFullDumpPointFillTwo: rgba(193, 231, 111, 1);
+  --LoadDumpZoneFullDumpPointFillThree: rgba(183, 227, 87, 1);
+  --LoadDumpZoneFullDumpPointOutline: rgba(146, 212, 0, 1);
+  --LoadDumpZoneVehicleLoadFill: rgba(146, 212, 0, 0.298);
+  --LoadDumpZoneVehicleLoadOutline: rgba(146, 212, 0, 1);
+  --LoadDumpZoneBermEdgeFill: rgba(251, 174, 49, 0.867);
+  --LoadDumpZoneClosedDumpPointFill: rgba(240, 171, 177, 1);
+
+  /* Vehicle Hull Colors */
+  --VehicleHullGeneric: rgba(136, 136, 136, 1);
+  --VehicleHullSteelWhite: rgba(245, 245, 245, 1);
+  --VehicleHullGunMetalGray: rgba(51, 51, 51, 1);
+  --VehicleHullSand: rgba(220, 214, 178, 1);
+  --VehicleHullMilitaryGreen: rgba(140, 140, 0, 1);
+  --VehicleHullBrown: rgba(102, 51, 0, 1);
+  --VehicleHullOceanTeal: rgba(0, 202, 202, 1);
+  --VehicleHullTeal: rgba(23, 126, 133, 1);
+  --VehicleHullBlue: rgba(0, 126, 174, 1);
+  --VehicleHullRoyalBlue: rgba(0, 82, 149, 1);
+  --VehicleHullLimeGreen: rgba(146, 212, 0, 1);
+  --VehicleHullForestGreen: rgba(32, 118, 44, 1);
+  --VehicleHullYellow: rgba(254, 209, 0, 1);
+  --VehicleHullOrange: rgba(255, 102, 0, 1);
+  --VehicleHullHotOrange: rgba(255, 64, 0, 1);
+  --VehicleHullRed: rgba(237, 41, 57, 1);
+  --VehicleHullPowerRed: rgba(184, 16, 33, 1);
+
+  /* Proximity Colors */
+  --ProximityOrange: rgba(255, 128, 0, 0.188);
+
+  /* Choreographer Colors */
+  --ChoreographerPink: rgba(255, 0, 162, 0.188);
+  --ChoreographerPurple: rgba(79, 0, 217, 0.188);
+  --ChoreographerGreenYellow: rgba(119, 217, 0, 0.188);
+
+  /* Planning Obstacle Colors */
+  --PlanningObstacleOrange: rgba(249, 126, 67, 1);
+  --PlanningObstacleFill: rgba(0, 0, 0, 0);
+
+  /* Road Grades Colors */
+  --RoadGradesTriangleBorder: rgba(112, 112, 112, 0.302);
+  --RoadGradesTriangleFill: rgba(112, 112, 112, 0.102);
+  --RoadGradesUniversalDownHillWedge: rgba(0, 0, 0, 1);
+
+  /* Pre-planning Colors */
+  --PrePlanningVisualization: rgba(0, 159, 218, 0.627);
+}
