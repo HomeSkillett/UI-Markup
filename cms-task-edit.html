@@ -343,17 +343,41 @@ body {
 /* Two-column form row */
 .form-row {
   display: flex;
-  gap: var(--size-24);
+  gap: 100px;
   margin-bottom: var(--spacing-field);
 }
 .form-row:last-child { margin-bottom: 0; }
 
 /* Let mob-field fill its column */
 .form-row .mob-field { flex: 1; min-width: 0; }
+/* Fixed label width so all input left edges align */
+.form-row .mob-field__label { width: 140px; min-width: 140px; }
 
-/* Inputs use component default width (--field-input-width: 220px) for aligned edges */
+/* Full-width single field row — right edge aligns with two-column rows */
+.form-row-full {
+  margin-bottom: var(--spacing-field);
+}
+.form-row-full .mob-field__label { width: 140px; min-width: 140px; }
+.form-row-full .mob-field__body { flex: 1; }
+.form-row-full .mob-input { width: 100%; }
 
-/* Label width — use component default (--field-label-min-width: 130px) */
+/* Override input width — stretch to fill column so right edges align */
+.form-row .mob-field__body { flex: 1; position: relative; }
+.form-row .mob-input { width: 100%; box-sizing: border-box; }
+/* Inner icon overlay (%, map pin, etc.) */
+.field-inner-icon {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ForegroundWatermark);
+  pointer-events: none;
+}
+/* Match datetime picker icon color to map pin */
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: opacity(0.4);
+}
+textarea.mob-input { padding: 10px; font: var(--font-default); }
 
 /* ====== ACTION BAR (bottom) ====== */
 .action-bar {
@@ -370,6 +394,7 @@ body {
   align-items: center;
   gap: var(--space-3);
 }
+.title-input { width: auto; }
 
 /* ====== ACTIVITY LOG TABLE ====== */
 .log-table { width: 100%; border-collapse: collapse; border-radius: 4px; overflow: hidden; background: var(--BackgroundStrong); }
@@ -504,8 +529,12 @@ body {
     </div>
     <div class="details-header-copy">
       <span class="details-header-subtitle">Jade - Retention Pond</span>
-      <div class="details-title-row">
-        <span class="details-header-title">Clear and Grub &#x2013; CMS_Task_312</span>
+      <div class="details-title-row" style="align-items: flex-end;">
+        <div class="mob-field mob-field--large-title">
+          <div class="mob-field__body" style="margin:0;">
+            <input class="mob-input title-input" type="text" value="Clear and Grub &#x2013; CMS_Task_312" />
+          </div>
+        </div>
         <div class="header-btn-group">
           <button class="mob-btn">Save</button>
           <a class="mob-btn-link" href="cms-details.html">Cancel</a>
@@ -534,7 +563,7 @@ body {
       <div class="mob-field">
         <label class="mob-field__label">Parent:</label>
         <div class="mob-field__body">
-          <input class="mob-input" type="text" value="WP-EARTH-001 (Retention Pond)" />
+          <input class="mob-input" type="text" value="Retention Pond" />
         </div>
       </div>
       <div class="mob-field">
@@ -592,17 +621,25 @@ body {
 
     <div class="form-row">
       <div class="mob-field">
-        <label class="mob-field__label">Margin of Error (%):</label>
+        <label class="mob-field__label">Area:</label>
         <div class="mob-field__body">
-          <input class="mob-input" type="text" value="&#177;2" />
-          <span class="mob-field__unit">%</span>
+          <input class="mob-input" type="text" value="Northeast Section" style="padding-right:30px;" />
+          <span class="field-inner-icon" style="font-family:'Mobius-System-Icons'; font-size:16px;">&#xE84C;</span>
         </div>
       </div>
       <div class="mob-field">
-        <label class="mob-field__label">Description:</label>
+        <label class="mob-field__label">Margin of Error:</label>
         <div class="mob-field__body">
-          <input class="mob-input" type="text" value="Remove vegetation, topsoil, and debris to establish cleared work zone for grading." />
+          <input class="mob-input" type="text" value="&#177;2" style="padding-right:30px;" />
+          <span class="field-inner-icon">%</span>
         </div>
+      </div>
+    </div>
+
+    <div class="mob-field form-row-full">
+      <label class="mob-field__label">Description:</label>
+      <div class="mob-field__body">
+        <textarea class="mob-input" rows="2" style="resize:vertical;">Remove vegetation, topsoil, and debris to establish cleared work zone for grading.</textarea>
       </div>
     </div>
 
@@ -756,6 +793,25 @@ body {
 </div>
 
 <script>
+
+/* Auto-size title input to its value */
+(function() {
+  var input = document.querySelector('.title-input');
+  if (!input) return;
+  var sizer = document.createElement('span');
+  sizer.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;';
+  document.body.appendChild(sizer);
+  function resize() {
+    var s = getComputedStyle(input);
+    sizer.style.font = s.font;
+    sizer.style.letterSpacing = s.letterSpacing;
+    sizer.style.padding = '0 ' + s.paddingLeft;
+    sizer.textContent = input.value || input.placeholder || ' ';
+    input.style.width = (sizer.offsetWidth + 20) + 'px';
+  }
+  resize();
+  input.addEventListener('input', resize);
+})();
 
 /* Side nav section collapse */
 document.querySelectorAll('.nav-section-header').forEach(header => {
