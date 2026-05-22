@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CMS — Details</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="design-tokens.css">
 <style>
 @font-face {
@@ -179,7 +182,7 @@ body {
 .nav-section-items {
   overflow: hidden;
   transition: max-height 0.4s ease, opacity 0.4s ease;
-  max-height: 500px;
+  max-height: 1000px;
   opacity: 1;
 }
 .nav-section.collapsed .nav-section-items {
@@ -212,6 +215,19 @@ body {
 .nav-item.active:hover {
   background: var(--MouseOverPrimary);
   color: var(--SelectionForeground);
+}
+/* Nav section Add button */
+.nav-add-btn {
+  display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 10px 0 46px;
+  background: transparent; border: none; cursor: pointer;
+  font: var(--font-normal) var(--size-default) / 1.5 var(--default-font);
+  color: var(--ForegroundPrimary);
+  transition: color var(--transition-slow);
+}
+.nav-add-btn:hover { color: var(--MouseOverPrimary); }
+.nav-add-btn::before {
+  content: "\E21C"; font-family: "Mobius-System-Icons"; font-size: 16px;
+  -webkit-font-smoothing: antialiased;
 }
 
 .page-content {
@@ -570,6 +586,7 @@ body {
       <div class="nav-item">Compactor (Berm Lift 1)</div>
       <div class="nav-item">Water Truck (Dust Control)</div>
       <div class="nav-item">Compactor (Berm Lift 2)</div>
+      <button class="nav-add-btn" onclick="location.href='cms-task-new.html'">Add</button>
     </div>
   </div>
 
@@ -586,6 +603,7 @@ body {
       <div class="nav-item">Compactor (Lift 1)</div>
       <div class="nav-item">Topping (Finish Shape)</div>
       <div class="nav-item">Water Truck (Dust Control)</div>
+      <button class="nav-add-btn" onclick="location.href='cms-task-new.html'">Add</button>
     </div>
   </div>
 
@@ -597,6 +615,7 @@ body {
     <div class="nav-section-items">
       <div class="nav-item">Compactor</div>
       <div class="nav-item">Reach Stacker &#x2013; Single Move</div>
+      <button class="nav-add-btn" onclick="location.href='cms-task-new.html'">Add</button>
     </div>
   </div>
 
@@ -609,6 +628,7 @@ body {
       <div class="nav-item">Reach Stacker &#x2013; Multiple Moves</div>
       <div class="nav-item">Forklift (Pallet Sort)</div>
       <div class="nav-item">Crane (Container Lift)</div>
+      <button class="nav-add-btn" onclick="location.href='cms-task-new.html'">Add</button>
     </div>
   </div>
 
@@ -621,6 +641,7 @@ body {
       <div class="nav-item">Dozer (Push-up)</div>
       <div class="nav-item">ADT (Material Haul)</div>
       <div class="nav-item">Water Truck (Dust Control)</div>
+      <button class="nav-add-btn" onclick="location.href='cms-task-new.html'">Add</button>
     </div>
   </div>
 </nav>

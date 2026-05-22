@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CMS — Edit Task</title>
+<title>CMS — New Task</title>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="../shared/css/components/buttons.css">
 <link rel="stylesheet" href="../shared/css/components/combobox.css">
 <link rel="stylesheet" href="../shared/css/components/slider.css">
+<link rel="stylesheet" href="../shared/css/components/icon-label-button.css">
 
 <style>
 /* Inline @font-face fallback for Mobius-System-Icons (fixes file:// loading) */
@@ -235,8 +236,6 @@ body {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .nav-item:hover { background: #cdeaf6; }
-.nav-item.active { background: var(--SelectionPrimary); color: var(--SelectionForeground); }
-.nav-item.active:hover { background: var(--MouseOverPrimary); color: var(--SelectionForeground); }
 /* Nav section Add button */
 .nav-add-btn {
   display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 10px 0 46px;
@@ -250,6 +249,8 @@ body {
   content: "\E21C"; font-family: "Mobius-System-Icons"; font-size: 16px;
   -webkit-font-smoothing: antialiased;
 }
+.nav-item.active { background: var(--SelectionPrimary); color: var(--SelectionForeground); }
+.nav-item.active:hover { background: var(--MouseOverPrimary); color: var(--SelectionForeground); }
 
 .page-content { flex: 1; min-width: 0; padding: 0; overflow: hidden; background: var(--BackgroundStrongStepOne); }
 
@@ -354,6 +355,9 @@ body {
   padding-right: 22px;
   text-align: center;
 }
+.combobox-vehicle-name .combobox.is-placeholder {
+  color: var(--ForegroundWatermark);
+}
 .combobox-vehicle-name::after {
   color: var(--ForegroundAction, #0075a1);
   right: 6px;
@@ -375,6 +379,10 @@ body {
 .map-panel {
   flex: 0 0 600px; max-width: 600px; position: sticky; top: 0; align-self: flex-start;
   background: var(--BackgroundStrong); margin: var(--space-8) var(--space-8) 0 0;
+  transition: opacity var(--transition-slow), flex-basis var(--transition-slow);
+}
+.map-panel.hidden {
+  flex: 0 0 0; max-width: 0; margin: 0; overflow: hidden; opacity: 0;
 }
 .map-panel img { width: 100%; height: auto; object-fit: contain; }
 
@@ -441,6 +449,27 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   filter: opacity(0.4);
 }
 textarea.mob-input { padding: 10px; font: var(--font-default); }
+/* Placeholder text color */
+/* Clickable meta links (Priority, Sequence in header) */
+.meta-link {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--transition-slow);
+}
+.meta-link:hover { color: var(--MouseOverPrimary); }
+
+::placeholder { color: var(--ForegroundWatermark); opacity: 1; }
+::-webkit-input-placeholder { color: var(--ForegroundWatermark); }
+::-moz-placeholder { color: var(--ForegroundWatermark); opacity: 1; }
+
+/* Select/input placeholder state — watermark color when no real value selected */
+.combobox.is-placeholder,
+.mob-input.is-placeholder { color: var(--ForegroundWatermark); }
+/* Datetime inputs with no value show watermark-colored text */
+input[type="datetime-local"].is-placeholder::-webkit-datetime-edit { color: var(--ForegroundWatermark); }
+/* Field prefix dims when sibling input is empty */
+.field-input-with-prefix:has(.mob-input.is-placeholder) .field-prefix { color: var(--ForegroundWatermark); }
 
 /* ====== ACTION BAR (bottom) ====== */
 .action-bar {
@@ -458,6 +487,64 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
   gap: var(--space-3);
 }
 .title-input { width: auto; }
+
+/* Split title: Task (clickable) + Name (free text) inline */
+.title-split {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+}
+.title-split .mob-input {
+  background-color: transparent;
+  border-color: transparent;
+  font-size: var(--size-hdrLg);
+  font-family: var(--header-font);
+  font-weight: var(--font-light);
+  line-height: 1.2;
+  padding: 4px 6px;
+  height: auto;
+  overflow: visible;
+}
+.title-split .mob-input:hover:not(:disabled):not(:read-only):not(:focus) {
+  background-color: var(--BackgroundInput);
+  border-color: var(--BackgroundInputOutline);
+}
+.title-split .mob-input:focus {
+  background-color: var(--BackgroundInput);
+  border-color: var(--MouseOverPrimary);
+}
+/* Task portion — read-only, clickable, sized to content */
+/* Task portion — plain text label, clickable to jump to Task combobox */
+.title-task-part {
+  font-size: var(--size-hdrLg);
+  font-family: var(--header-font);
+  font-weight: var(--font-light);
+  line-height: 1.2;
+  color: var(--ForegroundPrimary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color var(--transition-slow);
+}
+.title-task-part:hover { color: var(--MouseOverPrimary); }
+.title-task-part.is-placeholder { color: var(--ForegroundWatermark); }
+/* Separator dash between task and name */
+.title-separator {
+  font-size: var(--size-hdrLg);
+  font-family: var(--header-font);
+  font-weight: var(--font-light);
+  line-height: 1.2;
+  color: var(--ForegroundPrimary);
+  padding: 0 4px;
+  display: none;  /* hidden until task is selected */
+  flex-shrink: 0;
+}
+.title-separator.visible { display: inline; }
+/* Name portion — free text */
+.title-name-part {
+  flex: 1;
+  min-width: 120px;
+  width: auto;
+}
 
 /* ====== PARENT COMBOBOX / ADD-NEW TOGGLE ====== */
 /* Let combobox fill the column like other inputs */
@@ -643,7 +730,7 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
       <span class="nav-section-title">Retention Pond</span>
     </div>
     <div class="nav-section-items">
-      <div class="nav-item active">Clear and Grub</div>
+      <div class="nav-item">Clear and Grub</div>
       <div class="nav-item">Water Truck (Dust Control)</div>
       <div class="nav-item">Ripping</div>
       <div class="nav-item">Cut &amp; Fill (Bulk)</div>
@@ -745,12 +832,13 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
   <div class="details-header-main">
     <div class="details-vehicle-col">
       <div class="details-vehicle-icon">
-        <img src="Dozer.svg" alt="Dozer">
+        <img src="Dozer.svg" alt="Vehicle">
       </div>
       <div class="details-vehicle-name-wrap">
         <div class="combobox-wrap combobox-minimal combobox-vehicle-name">
           <select class="combobox" id="vehicle-select">
-            <option value="FN-D8T-123" selected>FN-D8T-123</option>
+            <option value="auto" selected>Auto Assign</option>
+            <option value="FN-D8T-123">FN-D8T-123</option>
             <option value="FN-D8T-456">FN-D8T-456</option>
             <option value="FN-EX330-007">FN-EX330-007</option>
             <option value="FN-ADT40-089">FN-ADT40-089</option>
@@ -760,18 +848,19 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
       </div>
     </div>
     <div class="details-header-copy">
-      <span class="details-header-subtitle">Jade - Retention Pond</span>
+      <span class="details-header-subtitle"><span id="subtitle-prefix">Southridge - </span><a class="meta-link" id="subtitle-parent-link"><span id="subtitle-parent">Parent Task</span></a></span>
       <div class="details-title-row" style="align-items: flex-end;">
         <div class="details-title-col">
-          <div class="mob-field mob-field--large-title">
-            <div class="mob-field__body" style="margin:0;">
-              <input class="mob-input title-input" type="text" value="Clear and Grub &#x2013; CMS_Task_312" />
-            </div>
+          <div class="title-split" style="margin: 0 0 0 -10px;">
+            <span class="title-task-part" id="title-task">Task</span>
+            <span class="title-separator" id="title-sep">&#x2013;</span>
+            <input class="mob-input title-name-part" type="text" id="title-name" value="" placeholder="Name" />
           </div>
           <div class="combobox-wrap combobox-minimal combobox-header-location">
             <span class="combobox-leading-icon">&#xE84C;</span>
-            <select class="combobox" id="header-location-select">
-              <option value="NortheastSection" selected>Northeast Section</option>
+            <select class="combobox is-placeholder" id="header-location-select">
+              <option value="" selected>Select location&#x2026;</option>
+              <option value="NortheastSection">Northeast Section</option>
               <option value="NorthwestSection">Northwest Section</option>
               <option value="SoutheastSection">Southeast Section</option>
               <option value="SouthwestSection">Southwest Section</option>
@@ -780,15 +869,15 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
           </div>
         </div>
         <div class="header-btn-group">
-          <button class="mob-btn">Save</button>
-          <a class="mob-btn-link" href="cms-details.html">Cancel</a>
+          <button class="mob-btn">Create</button>
+          <a class="mob-btn-link" href="cms.html">Cancel</a>
         </div>
       </div>
     </div>
   </div>
   <div class="details-header-meta">
-    <span>Priority: High; Sequence: 001</span>
-    <span>Remove vegetation, topsoil, and debris to establish cleared work zone for grading.</span>
+    <span><a class="meta-link" id="meta-priority-link">Priority: <span id="meta-priority-val">&#x2014;</span></a> ; <a class="meta-link" id="meta-sequence-link">Sequence: <span id="meta-sequence-val">&#x2014;</span></a></span>
+    <span>&nbsp;</span>
   </div>
 </div>
 
@@ -808,8 +897,9 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
         <div class="mob-field__body">
           <!-- ComboBox mode (default) -->
           <div class="combobox-wrap" id="parent-combo">
-            <select class="combobox" id="parent-select">
-              <option value="RetentionPond" selected>Retention Pond</option>
+            <select class="combobox is-placeholder" id="parent-select">
+              <option value="" selected>Select parent&#x2026;</option>
+              <option value="RetentionPond">Retention Pond</option>
               <option value="HaulRoad">Haul Road</option>
               <option value="EastPerimeter">East Perimeter</option>
               <option value="LoadingDock">Loading Dock</option>
@@ -827,7 +917,7 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
       <div class="mob-field">
         <label class="mob-field__label">Estimated Start:</label>
         <div class="mob-field__body">
-          <input class="mob-input" type="datetime-local" value="2025-11-17T08:00" />
+          <input class="mob-input is-placeholder" type="datetime-local" value="" />
         </div>
       </div>
     </div>
@@ -837,7 +927,7 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
         <label class="mob-field__label">Task:</label>
         <div class="mob-field__body">
           <div class="combobox-wrap combobox-editable" id="task-combo-wrap">
-            <input class="mob-input combobox-input" type="text" id="task-input" value="Grubbing" autocomplete="off" />
+            <input class="mob-input combobox-input is-placeholder" type="text" id="task-input" value="" placeholder="Select task type&#x2026;" autocomplete="off" />
             <div class="combobox-dropdown" id="task-dropdown">
               <div class="combobox-option" data-value="Grubbing">Grubbing</div>
               <div class="combobox-option" data-value="ScraperCutFill">Scraper Cut &amp; Fill (Scraping)</div>
@@ -858,7 +948,7 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
       <div class="mob-field">
         <label class="mob-field__label">Actual Start:</label>
         <div class="mob-field__body">
-          <input class="mob-input" type="datetime-local" value="2025-11-17T08:00" />
+          <input class="mob-input is-placeholder" type="datetime-local" value="" />
         </div>
       </div>
     </div>
@@ -868,9 +958,9 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
         <label class="mob-field__label">Equipment Types:</label>
         <div class="mob-field__body">
           <div class="combobox-wrap combobox-editable" id="equip-combo-wrap">
-            <input class="mob-input combobox-input" type="text" id="equip-input" value="Dozer D8T" autocomplete="off" />
+            <input class="mob-input combobox-input is-placeholder" type="text" id="equip-input" value="" placeholder="Select equipment&#x2026;" autocomplete="off" />
             <div class="combobox-dropdown" id="equip-dropdown">
-              <div class="combobox-option selected" data-value="DozerD8T">Dozer D8T</div>
+              <div class="combobox-option" data-value="DozerD8T">Dozer D8T</div>
               <div class="combobox-option" data-value="Excavator330">Excavator 330</div>
               <div class="combobox-option" data-value="ADT40T">ADT 40T</div>
             </div>
@@ -880,7 +970,7 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
       <div class="mob-field">
         <label class="mob-field__label">Estimated End:</label>
         <div class="mob-field__body">
-          <input class="mob-input" type="datetime-local" value="2025-11-17T17:00" />
+          <input class="mob-input is-placeholder" type="datetime-local" value="" />
         </div>
       </div>
     </div>
@@ -891,20 +981,20 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
         <div class="mob-field__body">
           <div class="mob-slider" id="priority-slider">
             <div class="mob-slider__track">
-              <div class="mob-slider__fill" style="width: 100%;"></div>
+              <div class="mob-slider__fill" style="width: 0%;"></div>
               <div class="mob-slider__track-line"></div>
               <div class="mob-slider__endcap"></div>
-              <div class="mob-slider__thumb-visual" style="left: calc(100% - 28px);"></div>
-              <input class="mob-slider__input" type="range" min="0" max="2" value="2" step="1" />
+              <div class="mob-slider__thumb-visual" style="left: calc(50% - 14px); opacity: 0.35;"></div>
+              <input class="mob-slider__input" type="range" min="0" max="2" value="1" step="1" data-unset="true" />
             </div>
-            <span class="mob-slider__value" id="priority-value">High</span>
+            <span class="mob-slider__value" id="priority-value">&#x2014;</span>
           </div>
         </div>
       </div>
       <div class="mob-field">
         <label class="mob-field__label">Actual End:</label>
         <div class="mob-field__body">
-          <input class="mob-input" type="text" placeholder="In Progress" readonly />
+          <input class="mob-input is-placeholder" type="datetime-local" value="" />
         </div>
       </div>
     </div>
@@ -914,8 +1004,9 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
         <label class="mob-field__label">Sequence:</label>
         <div class="mob-field__body">
           <div class="combobox-wrap" id="sequence-combo-wrap">
-            <select class="combobox" id="sequence-select">
-              <option value="001" selected>001</option>
+            <select class="combobox is-placeholder" id="sequence-select">
+              <option value="" selected>Select&#x2026;</option>
+              <option value="001">001</option>
               <option value="002">002</option>
               <option value="003">003</option>
               <option value="004">004</option>
@@ -934,7 +1025,7 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
         <div class="mob-field__body">
           <div class="field-input-with-prefix">
             <span class="field-prefix">&plusmn;</span>
-            <input class="mob-input" type="text" value="2" style="padding-left:24px; padding-right:30px;" />
+            <input class="mob-input is-placeholder" type="text" value="" placeholder="0" style="padding-left:24px; padding-right:30px;" />
           </div>
           <span class="field-inner-icon">%</span>
         </div>
@@ -944,7 +1035,7 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
     <div class="mob-field form-row-full">
       <label class="mob-field__label">Description:</label>
       <div class="mob-field__body">
-        <textarea class="mob-input" rows="2" style="resize:vertical;">Remove vegetation, topsoil, and debris to establish cleared work zone for grading.</textarea>
+        <textarea class="mob-input" rows="2" style="resize:vertical;" placeholder="Enter task description&#x2026;"></textarea>
       </div>
     </div>
 
@@ -958,13 +1049,13 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
       <div class="mob-field">
         <label class="mob-field__label">Coordinate Ref System:</label>
         <div class="mob-field__body">
-          <input class="mob-input" type="text" value="EPSG:4326 (WGS84)" />
+          <input class="mob-input" type="text" value="" placeholder="e.g. EPSG:4326 (WGS84)" />
         </div>
       </div>
       <div class="mob-field">
         <label class="mob-field__label">Operational Polygon:</label>
         <div class="mob-field__body">
-          <input class="mob-input" type="text" value="Polygon_A_Clear_Zone.geojson" />
+          <input class="mob-input" type="text" id="op-polygon-input" value="" placeholder="e.g. Polygon.geojson" />
         </div>
       </div>
     </div>
@@ -973,13 +1064,13 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
       <div class="mob-field">
         <label class="mob-field__label">Polygon Exclusions:</label>
         <div class="mob-field__body">
-          <input class="mob-input" type="text" value="EPSG:4326 (WGS84)" />
+          <input class="mob-input" type="text" value="" />
         </div>
       </div>
       <div class="mob-field">
         <label class="mob-field__label">Path Network:</label>
         <div class="mob-field__body">
-          <input class="mob-input" type="text" value="SiteA_RoadNetwork.json" />
+          <input class="mob-input" type="text" value="" placeholder="e.g. RoadNetwork.json" />
         </div>
       </div>
     </div>
@@ -988,13 +1079,13 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
       <div class="mob-field">
         <label class="mob-field__label">Existing Surface:</label>
         <div class="mob-field__body">
-          <input class="mob-input" type="text" value="Surface_PreClear_2025_11_06.dxf" />
+          <input class="mob-input" type="text" value="" placeholder="e.g. Surface.dxf" />
         </div>
       </div>
       <div class="mob-field">
         <label class="mob-field__label">Design Surface:</label>
         <div class="mob-field__body">
-          <input class="mob-input" type="text" value="Surface_PostClear_2025_11_07.dxf" />
+          <input class="mob-input" type="text" value="" placeholder="e.g. Surface.dxf" />
         </div>
       </div>
     </div>
@@ -1009,13 +1100,13 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
       <div class="mob-field">
         <label class="mob-field__label">Constraints:</label>
         <div class="mob-field__body">
-          <input class="mob-input" type="text" value="No work after 6 PM; 25m buffer from drainage channel" />
+          <input class="mob-input" type="text" value="" />
         </div>
       </div>
       <div class="mob-field">
         <label class="mob-field__label">Obstacle(s):</label>
         <div class="mob-field__body">
-          <input class="mob-input" type="text" value="Power Line: 12kV overhead; Pipe: Water &#x2013; 1.5m depth" />
+          <input class="mob-input" type="text" value="" />
         </div>
       </div>
     </div>
@@ -1024,20 +1115,20 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
       <div class="mob-field">
         <label class="mob-field__label">Dust Control:</label>
         <div class="mob-field__body">
-          <input class="mob-input" type="text" value="Required" />
+          <input class="mob-input" type="text" value="" />
         </div>
       </div>
       <div class="mob-field">
         <label class="mob-field__label">Linked Task:</label>
         <div class="mob-field__body">
-          <input class="mob-input" type="text" value="WT-DUST-001" />
+          <input class="mob-input" type="text" value="" />
         </div>
       </div>
     </div>
 
   </div>
 
-  <!-- Activity Log (read-only) -->
+  <!-- Activity Log (empty for new task) -->
   <div class="content-section">
     <div class="content-section-title">Activity Log</div>
     <table class="log-table">
@@ -1051,28 +1142,7 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
       </thead>
       <tbody>
         <tr>
-          <td>2026-02-13 14:30</td>
-          <td>Task Received</td>
-          <td>CMS_Task_312 &#x2014; Clear and Grub</td>
-          <td>Carlo H. Bos</td>
-        </tr>
-        <tr>
-          <td>2026-02-13 14:30</td>
-          <td>In-Progress</td>
-          <td>CMS_Task_312 &#x2014; Clear and Grub</td>
-          <td>Carlo H. Bos</td>
-        </tr>
-        <tr>
-          <td>2026-02-13 14:30</td>
-          <td>E-Stop</td>
-          <td>CMS_Task_312 &#x2014; Clear and Grub</td>
-          <td>Carlo H. Bos</td>
-        </tr>
-        <tr>
-          <td>2026-02-13 14:30</td>
-          <td>Completed</td>
-          <td>CMS_Task_312 &#x2014; Clear and Grub</td>
-          <td>Carlo H. Bos</td>
+          <td colspan="4" style="text-align:center; color:var(--ForegroundWatermark); font-style:italic;">No activity recorded</td>
         </tr>
       </tbody>
     </table>
@@ -1080,14 +1150,14 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
 
   <!-- Action Bar -->
   <div class="action-bar">
-    <button class="mob-btn">Save</button>
-    <a class="mob-btn-link" href="cms-details.html">Cancel</a>
+    <button class="mob-btn">Create</button>
+    <a class="mob-btn-link" href="cms.html">Cancel</a>
   </div>
 
 </div>
 
 <!-- Right: Map Panel -->
-<div class="map-panel">
+<div class="map-panel hidden" id="map-panel">
   <img src="Map.svg" alt="Site Map">
 </div>
 
@@ -1099,23 +1169,25 @@ textarea.mob-input { padding: 10px; font: var(--font-default); }
 
 <script>
 
-/* Auto-size title input to its value */
+/* Auto-size title Name input to its content */
 (function() {
-  var input = document.querySelector('.title-input');
-  if (!input) return;
+  var namePart = document.getElementById('title-name');
+  if (!namePart) return;
   var sizer = document.createElement('span');
   sizer.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;';
   document.body.appendChild(sizer);
-  function resize() {
-    var s = getComputedStyle(input);
+
+  function autoSize() {
+    var s = getComputedStyle(namePart);
     sizer.style.font = s.font;
     sizer.style.letterSpacing = s.letterSpacing;
     sizer.style.padding = '0 ' + s.paddingLeft;
-    sizer.textContent = input.value || input.placeholder || ' ';
-    input.style.width = (sizer.offsetWidth + 20) + 'px';
+    sizer.textContent = namePart.value || namePart.placeholder || ' ';
+    namePart.style.width = (sizer.offsetWidth + 20) + 'px';
   }
-  resize();
-  input.addEventListener('input', resize);
+
+  autoSize();
+  namePart.addEventListener('input', autoSize);
 })();
 
 /* Side nav section collapse */
@@ -1176,7 +1248,7 @@ document.addEventListener('click', () => {
   document.querySelectorAll('.status-btn-wrap.open').forEach(w => w.classList.remove('open'));
 });
 
-/* Priority slider: sync visual + value label */
+/* Priority slider: sync visual + value label + header meta */
 (function() {
   var priorityLabels = ['Low', 'Med', 'High'];
   var slider = document.querySelector('#priority-slider');
@@ -1185,17 +1257,32 @@ document.addEventListener('click', () => {
   var fill = slider.querySelector('.mob-slider__fill');
   var thumb = slider.querySelector('.mob-slider__thumb-visual');
   var display = document.getElementById('priority-value');
+  var metaVal = document.getElementById('meta-priority-val');
 
   function sync() {
+    if (input.dataset.unset === 'true') {
+      delete input.dataset.unset;
+      thumb.style.opacity = '';
+    }
     var val = parseInt(input.value);
     var pct = (val / 2) * 100;
     fill.style.width = pct + '%';
     thumb.style.left = 'calc(' + pct + '% - ' + (pct * 28 / 100) + 'px)';
-    display.textContent = priorityLabels[val] || '';
+    var label = priorityLabels[val] || '';
+    display.textContent = label;
+    if (metaVal) metaVal.textContent = label || '—';
   }
 
   input.addEventListener('input', sync);
-  sync();
+
+  /* Click meta link → scroll to & focus priority slider */
+  var link = document.getElementById('meta-priority-link');
+  if (link) {
+    link.addEventListener('click', function() {
+      slider.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(function() { input.focus(); }, 300);
+    });
+  }
 })();
 
 /* Editable ComboBox: Task field — type-to-select */
@@ -1205,6 +1292,16 @@ document.addEventListener('click', () => {
   var dropdown = document.getElementById('task-dropdown');
   var options = dropdown.querySelectorAll('.combobox-option');
   var highlightIdx = -1;
+  var titleTaskPart = document.getElementById('title-task');
+  var titleSep = document.getElementById('title-sep');
+
+  /* Clicking the Task portion of the title focuses the Task combobox */
+  if (titleTaskPart) {
+    titleTaskPart.addEventListener('click', function() {
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(function() { input.focus(); }, 300);
+    });
+  }
 
   function openDropdown() {
     wrap.classList.add('open');
@@ -1248,12 +1345,13 @@ document.addEventListener('click', () => {
     options.forEach(function(o) { o.classList.remove('selected'); });
     opt.classList.add('selected');
     closeDropdown();
+    /* Update title Task portion + show separator */
+    if (titleTaskPart) {
+      titleTaskPart.textContent = opt.textContent || 'Task';
+      titleTaskPart.classList.toggle('is-placeholder', !opt.textContent);
+    }
+    if (titleSep) titleSep.classList.toggle('visible', !!opt.textContent);
   }
-
-  // Mark initial selection
-  options.forEach(function(opt) {
-    if (opt.textContent === input.value) opt.classList.add('selected');
-  });
 
   input.addEventListener('focus', openDropdown);
   input.addEventListener('input', function() { openDropdown(); });
@@ -1377,14 +1475,23 @@ document.addEventListener('click', () => {
   });
 })();
 
-/* Parent field: ComboBox ↔ FieldInput toggle */
+/* Parent field: ComboBox ↔ FieldInput toggle + header subtitle sync */
 (function() {
   var select = document.getElementById('parent-select');
   var combo = document.getElementById('parent-combo');
   var inputWrap = document.getElementById('parent-input-wrap');
   var newInput = document.getElementById('parent-new-input');
   var closeBtn = document.getElementById('parent-close');
+  var subtitleParent = document.getElementById('subtitle-parent');
+  var subtitleLink = document.getElementById('subtitle-parent-link');
   var lastValue = select.value;
+
+  function updateSubtitle() {
+    if (!subtitleParent) return;
+    var opt = select.options[select.selectedIndex];
+    var text = (select.value && select.value !== '__addnew__') ? opt.textContent : 'Parent Task';
+    subtitleParent.textContent = text;
+  }
 
   select.addEventListener('change', function() {
     if (select.value === '__addnew__') {
@@ -1394,6 +1501,7 @@ document.addEventListener('click', () => {
       newInput.focus();
     } else {
       lastValue = select.value;
+      updateSubtitle();
     }
   });
 
@@ -1401,6 +1509,84 @@ document.addEventListener('click', () => {
     inputWrap.style.display = 'none';
     combo.style.display = 'inline-block';
     select.value = lastValue;
+    updateSubtitle();
+  });
+
+  /* Click header subtitle → scroll to & open Parent combobox */
+  if (subtitleLink) {
+    subtitleLink.addEventListener('click', function() {
+      select.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(function() {
+        select.focus();
+        try { select.showPicker(); } catch(e) {}
+      }, 300);
+    });
+  }
+})();
+
+/* Vehicle select: watermark color when placeholder selected */
+(function() {
+  var sel = document.getElementById('vehicle-select');
+  if (!sel) return;
+  sel.addEventListener('change', function() {
+    sel.classList.toggle('is-placeholder', !sel.value);
+  });
+})();
+
+/* Sequence combobox: sync header meta + click-to-focus */
+(function() {
+  var sel = document.getElementById('sequence-select');
+  var metaVal = document.getElementById('meta-sequence-val');
+  var link = document.getElementById('meta-sequence-link');
+  if (!sel) return;
+
+  sel.addEventListener('change', function() {
+    if (metaVal) metaVal.textContent = sel.value || '—';
+  });
+
+  if (link) {
+    link.addEventListener('click', function() {
+      sel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(function() {
+        sel.focus();
+        try { sel.showPicker(); } catch(e) {}
+      }, 300);
+    });
+  }
+})();
+
+/* Show map panel when user clicks into Operational Polygon */
+(function() {
+  var input = document.getElementById('op-polygon-input');
+  var map = document.getElementById('map-panel');
+  if (!input || !map) return;
+  input.addEventListener('focus', function() {
+    map.classList.remove('hidden');
+  });
+})();
+
+/* Global: toggle is-placeholder on all selects and datetime inputs */
+(function() {
+  /* Selects — remove placeholder class when a real value is chosen */
+  document.querySelectorAll('select.combobox').forEach(function(sel) {
+    sel.addEventListener('change', function() {
+      sel.classList.toggle('is-placeholder', !sel.value);
+    });
+  });
+
+  /* Datetime inputs — remove placeholder class when value is set */
+  document.querySelectorAll('input[type="datetime-local"]').forEach(function(inp) {
+    inp.addEventListener('change', function() {
+      inp.classList.toggle('is-placeholder', !inp.value);
+    });
+  });
+
+  /* All text/number inputs with is-placeholder — toggle on input */
+  document.querySelectorAll('.mob-input.is-placeholder, .combobox-editable .combobox-input').forEach(function(inp) {
+    if (inp.tagName === 'SELECT' || inp.type === 'datetime-local') return;
+    function check() { inp.classList.toggle('is-placeholder', !inp.value); }
+    inp.addEventListener('input', check);
+    inp.addEventListener('blur', check);
   });
 })();
 
